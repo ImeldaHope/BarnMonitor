@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 # server/models/health_record.py
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from config import db
+=======
+from config import db, SerializerMixin
+from sqlalchemy import Column, Integer, String, Date
+>>>>>>> main
 
 class HealthRecord(db.Model):
     __tablename__ = 'health_records'
@@ -11,6 +16,7 @@ class HealthRecord(db.Model):
     animal_id = Column(Integer, ForeignKey('animals.id'), nullable=False)
     checkup_date = Column(DateTime, default=datetime.utcnow)
     treatment = Column(String, nullable=False)
+    notes= Column(String)
     vet_name = Column(String, nullable=False)
 
     animal = relationship("Animal", back_populates="health_records")

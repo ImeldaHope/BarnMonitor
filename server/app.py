@@ -7,14 +7,14 @@ from sqlalchemy.exc import IntegrityError
 from flask_restful import Api, Resource  # Import Flask-RESTful
 
 from models import Farmer, AnimalType, HealthRecord, Production, Sale  # Import all models
-from config import db  # Import the database (db) instance
+from config import db,app  # Import the database (db) instance
 
-app = Flask(__name__)
-app.config.from_object('config.Config')  # Load configuration from config.py
+# app = Flask(__name__)
+# # app.config.from_object('config.Config')  # Load configuration from config.py
 
-bcrypt = Bcrypt(app)
-migrate = Migrate(app, db)  # Initialize migrations
-db.init_app(app)  # Initialize the database with the app
+# bcrypt = Bcrypt(app)
+# migrate = Migrate(app, db)  # Initialize migrations
+# db.init_app(app)  # Initialize the database with the app
 
 api = Api(app)  # Initialize Flask-RESTful API
 
