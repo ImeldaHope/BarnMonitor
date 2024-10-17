@@ -5,6 +5,7 @@ from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 
+
 from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal  # Import all models
 from config import db,app, api  
 
@@ -81,6 +82,7 @@ class AnimalById(Resource):
 
 api.add_resource(AnimalById,'/animals/<int:id>')
 
+
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
@@ -102,44 +104,94 @@ def signup():
         return jsonify({'message': 'Email already exists!'}), 409
 
 
-@app.route('/animal_types', methods=['GET'])
-def get_animal_types():
-    types = AnimalType.query.all()
-    return jsonify([t.type_name for t in types])
+# AnimalType Resource (CRUD for Animal Types)
+class AnimalTypeResource(Resource):
+    def get(self, id=None):
+        if id:
+            animal_type = AnimalType.query.get(id)
+            if animal_type:
+                return jsonify(animal_type.to_dict())
+            return jsonify({'message': 'Animal Type not found'}), 404
+        else:
+            types = AnimalType.query.all()
+            return jsonify([t.to_dict() for t in types])
+
+    def post(self):
+        data = request.get_json()
+        new_type = AnimalType(type_name=data['type_name'], description=data.get('description', ''))
+        db.session.add(new_type)
+        db.session.commit()
+        return jsonify({'message': 'Animal Type added successfully'})
+
+    def put(self, id):
+        animal_type = AnimalType.query.get(id)
+        if animal_type:
+            data = request.get_json()
+            animal_type.type_name = data.get('type_name', animal_type.type_name)
+            animal_type.description = data.get('description', animal_type.description)
+            db.session.commit()
+            return jsonify({'message': 'Animal Type updated successfully'})
+        return jsonify({'message': 'Animal Type not found'}), 404
+
+    def delete(self, id):
+        animal_type = AnimalType.query.get(id)
+        if animal_type:
+            db.session.delete(animal_type)
+            db.session.commit()
+            return jsonify({'message': 'Animal Type deleted successfully'})
+        return jsonify({'message': 'Animal Type not found'}), 404
 
 
-@app.route('/animal_types', methods=['POST'])
-def add_animal_type():
-    data = request.get_json()
-    new_type = AnimalType(type_name=data['type_name'], description=data.get('description', ''))
-    db.session.add(new_type)
-    db.session.commit()
-    return jsonify({'message': 'Animal Type added successfully'})
+# HealthRecord Resource (CRUD for Health Records)
+class HealthRecordResource(Resource):
+    def get(self, id=None):
+        if id:
+            health_record = HealthRecord.query.get(id)
+            if health_record:
+                return jsonify(health_record.to_dict())
+            return jsonify({'message': 'Health Record not found'}), 404
+        else:
+            records = HealthRecord.query.all()
+            return jsonify([r.to_dict() for r in records])
+
+    def post(self):
+        data = request.get_json()
+        new_record = HealthRecord(
+            animal_id=data['animal_id'],
+            checkup_date=data['checkup_date'],
+            treatment=data['treatment'],
+            vet_name=data['vet_name']
+        )
+        db.session.add(new_record)
+        db.session.commit()
+        return jsonify({'message': 'Health record added successfully'})
+
+    def put(self, id):
+        health_record = HealthRecord.query.get(id)
+        if health_record:
+            data = request.get_json()
+            health_record.animal_id = data.get('animal_id', health_record.animal_id)
+            health_record.checkup_date = data.get('checkup_date', health_record.checkup_date)
+            health_record.treatment = data.get('treatment', health_record.treatment)
+            health_record.vet_name = data.get('vet_name', health_record.vet_name)
+            db.session.commit()
+            return jsonify({'message': 'Health record updated successfully'})
+        return jsonify({'message': 'Health record not found'}), 404
+
+    def delete(self, id):
+        health_record = HealthRecord.query.get(id)
+        if health_record:
+            db.session.delete(health_record)
+            db.session.commit()
+            return jsonify({'message': 'Health record deleted successfully'})
+        return jsonify({'message': 'Health record not found'}), 404
 
 
-@app.route('/health_records', methods=['GET'])
-def get_health_records():
-    records = HealthRecord.query.all()
-    return jsonify([{
-        'animal_id': r.animal_id,
-        'checkup_date': r.checkup_date,
-        'treatment': r.treatment,
-        'vet_name': r.vet_name
-    } for r in records])
+# Register API resources with their respective endpoints
+api.add_resource(AnimalTypeResource, '/animal_types', '/animal_types/<int:id>')
+api.add_resource(HealthRecordResource, '/health_records', '/health_records/<int:id>')
 
 
-@app.route('/health_records', methods=['POST'])
-def add_health_record():
-    data = request.get_json()
-    new_record = HealthRecord(
-        animal_id=data['animal_id'],
-        checkup_date=data['checkup_date'],
-        treatment=data['treatment'],
-        vet_name=data['vet_name']
-    )
-    db.session.add(new_record)
-    db.session.commit()
-    return jsonify({'message': 'Health record added successfully'})
 
 #Production Routes
 @app.route('/productions', methods=['GET'])
