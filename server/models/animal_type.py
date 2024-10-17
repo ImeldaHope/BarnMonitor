@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-from ..config import db, SerializerMixin
-=======
 from config import db, SerializerMixin
-from sqlalchemy import Column, Integer, String
->>>>>>> main
 
 class AnimalType(db.Model, SerializerMixin):
     __tablename__ = 'animal_types'

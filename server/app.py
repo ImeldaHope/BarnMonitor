@@ -1,22 +1,86 @@
 # server/app.py
-from flask import Flask, jsonify, request
+from flask import jsonify, make_response, request
 from flask_bcrypt import Bcrypt
-from flask_migrate import Migrate
+from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
-from flask_restful import Api, Resource  # Import Flask-RESTful
 
-from models import Farmer, AnimalType, HealthRecord, Production, Sale  # Import all models
-from config import db,app  # Import the database (db) instance
 
-# app = Flask(__name__)
-# # app.config.from_object('config.Config')  # Load configuration from config.py
+from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal  # Import all models
+from config import db,app, api  
 
-# bcrypt = Bcrypt(app)
-# migrate = Migrate(app, db)  # Initialize migrations
-# db.init_app(app)  # Initialize the database with the app
 
-api = Api(app)  # Initialize Flask-RESTful API
+class Animals(Resource):
+    def get(self):
+        animals = [animal.to_dict() for animal in Animal.query.all()] 
+        return jsonify(animals), 200
+
+    def post(self):
+        name = request.get_json()['name']
+        breed = request.get_json()['breed']
+        age = request.get_json()['age']
+        health_status = request.get_json()['health_status']
+        birth_date = request.get_json()['birth_date']
+
+        new_animal = Animal(name=name, breed=breed, age=age, health_status=health_status, birth_date=birth_date)
+
+        try:
+            db.session.add(new_animal)
+            db.session.commit()
+        except ValueError as ve:
+            return {'error': str(ve)}, 422
+        except IntegrityError:
+            return {'errors': '422 Unprocessable Entity'}, 422
+
+
+        return make_response(jsonify(new_animal.to_dict()), 201)
+
+api.add_resource(Animals,'/animals')
+
+class AnimalById(Resource):
+    def get(self, id):
+        animal = Animal.query.filter_by(id=id).first()
+        if animal:
+            return animal.to_dict(), 200
+        else:
+            return make_response({"error": "Animal not found"}, 404)
+
+    def patch(self, id):
+        animal = Animal.query.filter_by(id=id).first()
+
+        if not animal:
+            return make_response(jsonify({"message": "Animal not found"}), 404)
+        
+        data = request.get_json()
+
+        if 'name' in data:
+            animal.name = data['name']
+        if 'animal_type_id' in data:
+            animal.animal_type_id = data['animal_type_id']
+        if 'age' in data:
+            animal.age = data['age']
+        if 'farmer_id' in data:
+            animal.farmer_id = data['farmer_id']
+        if 'health_status' in data:
+            animal.health_status = data['health_status']
+        if 'birth_date' in data:
+            animal.birth_date = data['birth_date']
+        if 'breed' in data:
+            animal.breed = data['breed']
+
+        db.session.commit()
+
+        return make_response(jsonify(animal.to_dict()), 200)
+
+    def delete(self, id):
+        animal = Animal.query.filter_by(id=id).first()
+
+        db.session.delete(animal)
+        db.session.commit()
+
+        return make_response({"message":"no content"}, 204)
+
+api.add_resource(AnimalById,'/animals/<int:id>')
 
 
 @app.route('/signup', methods=['POST'])
