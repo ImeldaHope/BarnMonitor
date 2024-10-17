@@ -1,9 +1,8 @@
 from config import db, SerializerMixin
-<<<<<<< HEAD
+
 from sqlalchemy.orm import validates
 from datetime import datetime
-=======
->>>>>>> main
+
 
 class Production(db.Model, SerializerMixin):
     __tablename__ = 'productions'

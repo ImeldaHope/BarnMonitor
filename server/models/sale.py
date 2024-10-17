@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-from ..config import db, SerializerMixin
+from config import db, SerializerMixin
 from sqlalchemy.orm import validates
 from datetime import datetime
-=======
-from config import db, SerializerMixin
->>>>>>> main
+
 
 class Sale(db.Model, SerializerMixin):
     __tablename__ = 'sales'
@@ -51,3 +48,4 @@ class Sale(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f'<Sale {self.id} {self.product_type} {self.quantity_sold}>'
+    
