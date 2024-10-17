@@ -1,4 +1,4 @@
-// client/src/components/AddHealthRecord.jsx
+// src/components/AddHealthRecord.jsx
 import React, { useState } from 'react';
 
 const AddHealthRecord = () => {
@@ -9,50 +9,28 @@ const AddHealthRecord = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch('/health_records', {
+    const record = { animal_id: animalId, checkup_date: checkupDate, treatment, vet_name: vetName };
+    fetch('/api/health_records', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        animal_id: animalId,
-        checkup_date: checkupDate,
-        treatment,
-        vet_name: vetName,
-      }),
-    }).then(() => {
-      alert('Health record added');
-    });
+      body: JSON.stringify(record),
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
   };
 
   return (
     <div>
       <h2>Add Health Record</h2>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Animal ID"
-          value={animalId}
-          onChange={(e) => setAnimalId(e.target.value)}
-        />
-        <input
-          type="date"
-          value={checkupDate}
-          onChange={(e) => setCheckupDate(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Treatment"
-          value={treatment}
-          onChange={(e) => setTreatment(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Vet Name"
-          value={vetName}
-          onChange={(e) => setVetName(e.target.value)}
-        />
-        <button type="submit">Add</button>
+        <input type="text" placeholder="Animal ID" value={animalId} onChange={(e) => setAnimalId(e.target.value)} required />
+        <input type="date" placeholder="Checkup Date" value={checkupDate} onChange={(e) => setCheckupDate(e.target.value)} required />
+        <input type="text" placeholder="Treatment" value={treatment} onChange={(e) => setTreatment(e.target.value)} required />
+        <input type="text" placeholder="Vet Name" value={vetName} onChange={(e) => setVetName(e.target.value)} required />
+        <button type="submit">Add Record</button>
       </form>
     </div>
   );

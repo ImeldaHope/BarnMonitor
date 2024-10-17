@@ -1,14 +1,12 @@
 from config import db, SerializerMixin
-from sqlalchemy import Column, Integer, String
 
 class AnimalType(db.Model, SerializerMixin):
     __tablename__ = 'animal_types'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    type_name = Column(String, nullable=False, unique=True)
-    description = Column(String)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    type_name = db.Column(db.String, nullable=False, unique=True)
+    description = db.Column(db.String)
 
-    # One-to-Many relationship with Animal (if you have animals linked to types)
     animals = db.relationship('Animal', back_populates='animal_type')
 
     def __repr__(self):
