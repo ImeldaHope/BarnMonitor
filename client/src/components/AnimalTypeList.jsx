@@ -1,21 +1,22 @@
-// client/src/components/AnimalTypeList.jsx
+// src/components/AnimalTypeList.jsx
 import React, { useState, useEffect } from 'react';
 
 const AnimalTypeList = () => {
-  const [types, setTypes] = useState([]);
+  const [animalTypes, setAnimalTypes] = useState([]);
 
   useEffect(() => {
-    fetch('/animal_types')
-      .then(response => response.json())
-      .then(data => setTypes(data));
+    fetch('/api/animal_types')
+      .then(res => res.json())
+      .then(data => setAnimalTypes(data))
+      .catch(error => console.error('Error:', error));
   }, []);
 
   return (
     <div>
       <h2>Animal Types</h2>
       <ul>
-        {types.map((type, index) => (
-          <li key={index}>{type}</li>
+        {animalTypes.map((type) => (
+          <li key={type.id}>{type.type_name}</li>
         ))}
       </ul>
     </div>
