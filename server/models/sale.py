@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 from ..config import db, SerializerMixin
 from sqlalchemy.orm import validates
 from datetime import datetime
+=======
+from config import db, SerializerMixin
+>>>>>>> main
 
 class Sale(db.Model, SerializerMixin):
     __tablename__ = 'sales'
