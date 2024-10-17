@@ -10,7 +10,7 @@ from .production import Production
 from .sale import Sale
 
 # Import the db instance from config
-from ..config import db
+from config import db
 
 # Register models with db to ensure they can be used with SQLAlchemy
 __all__ = ['Animal', 'AnimalType', 'Farmer', 'Feed', 'HealthRecord', 'Production', 'Sale']

@@ -1,4 +1,4 @@
-from ..config import db, SerializerMixin
+from config import db, SerializerMixin
 from sqlalchemy import Column, Integer, String
 
 class AnimalType(db.Model, SerializerMixin):
