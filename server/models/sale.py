@@ -1,4 +1,4 @@
-from ..config import db, SerializerMixin
+from config import db, SerializerMixin
 
 class Sale(db.Model, SerializerMixin):
     __tablename__ = 'sales'

@@ -1,4 +1,4 @@
-from ..config import db, SerializerMixin
+from config import db, SerializerMixin
 from sqlalchemy import Column, Integer, String, Date
 
 class HealthRecord(db.Model, SerializerMixin):
@@ -8,6 +8,7 @@ class HealthRecord(db.Model, SerializerMixin):
     animal_id = Column(Integer, db.ForeignKey('animals.id'), nullable=False)
     checkup_date = Column(Date, nullable=False)
     treatment = Column(String, nullable=False)
+    notes= Column(String)
     vet_name = Column(String, nullable=False)
 
     # Many-to-One relationship with Animal
