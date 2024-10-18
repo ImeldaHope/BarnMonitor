@@ -1,5 +1,6 @@
 # server/models/health_record.py
 from config import db, SerializerMixin
+from datetime import datetime
 
 class HealthRecord(db.Model, SerializerMixin):
     __tablename__ = 'health_records'

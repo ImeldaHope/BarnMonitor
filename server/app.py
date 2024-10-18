@@ -5,9 +5,8 @@ from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 
-
-from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal  # Import all models
-from config import db,app, api  
+from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal, Feed  # Import all models
+from config import db, app, api  
 
 
 class Animals(Resource):
@@ -32,10 +31,9 @@ class Animals(Resource):
         except IntegrityError:
             return {'errors': '422 Unprocessable Entity'}, 422
 
-
         return make_response(jsonify(new_animal.to_dict()), 201)
 
-api.add_resource(Animals,'/animals')
+api.add_resource(Animals, '/animals')
 
 class AnimalById(Resource):
     def get(self, id):
@@ -78,9 +76,9 @@ class AnimalById(Resource):
         db.session.delete(animal)
         db.session.commit()
 
-        return make_response({"message":"no content"}, 204)
+        return make_response({"message": "no content"}, 204)
 
-api.add_resource(AnimalById,'/animals/<int:id>')
+api.add_resource(AnimalById, '/animals/<int:id>')
 
 
 @app.route('/signup', methods=['POST'])
@@ -102,6 +100,76 @@ def signup():
     except IntegrityError:
         db.session.rollback()
         return jsonify({'message': 'Email already exists!'}), 409
+
+
+# Farmer Resource
+class FarmerResource(Resource):
+    def get(self, id=None):
+        if id:
+            farmer = Farmer.query.get(id)
+            if farmer:
+                return jsonify(farmer.to_dict())
+            return jsonify({'message': 'Farmer not found'}), 404
+        else:
+            farmers = Farmer.query.all()
+            return jsonify([f.to_dict() for f in farmers])
+
+    def post(self):
+        data = request.get_json()
+        new_farmer = Farmer(
+            name=data['name'],
+            email=data['email'],
+            phone=data['phone']
+        )
+        db.session.add(new_farmer)
+        db.session.commit()
+        return jsonify({'message': 'Farmer added successfully', 'farmer': new_farmer.to_dict()}), 201
+
+    def delete(self, id):
+        farmer = Farmer.query.get(id)
+        if farmer:
+            db.session.delete(farmer)
+            db.session.commit()
+            return jsonify({'message': 'Farmer deleted successfully'})
+        return jsonify({'message': 'Farmer not found'}), 404
+
+api.add_resource(FarmerResource, '/farmers', '/farmers/<int:id>')
+
+
+# Feed Resource
+class FeedResource(Resource):
+    def get(self, id=None):
+        if id:
+            feed = Feed.query.get(id)
+            if feed:
+                return jsonify(feed.to_dict())
+            return jsonify({'message': 'Feed not found'}), 404
+        else:
+            feeds = Feed.query.all()
+            return jsonify([f.to_dict() for f in feeds])
+
+    def post(self):
+        data = request.get_json()
+        new_feed = Feed(
+            name=data['name'],
+            type=data['type'],
+            quantity=data['quantity'],
+            price=data['price'],
+            supplier=data.get('supplier', '')
+        )
+        db.session.add(new_feed)
+        db.session.commit()
+        return jsonify({'message': 'Feed added successfully', 'feed': new_feed.to_dict()}), 201
+
+    def delete(self, id):
+        feed = Feed.query.get(id)
+        if feed:
+            db.session.delete(feed)
+            db.session.commit()
+            return jsonify({'message': 'Feed deleted successfully'})
+        return jsonify({'message': 'Feed not found'}), 404
+
+api.add_resource(FeedResource, '/feeds', '/feeds/<int:id>')
 
 
 # AnimalType Resource (CRUD for Animal Types)
@@ -215,7 +283,7 @@ class ProductionResource(Resource):
         )
         db.session.add(new_production)
         db.session.commit()
-        return jsonify({'message': 'Production record added successfully'}), 201
+        return jsonify(new_production.to_dict()), 201, 201
 
     def patch(self, id):
         production = Production.query.get(id)
@@ -302,4 +370,6 @@ api.add_resource(SaleResource, '/sales', '/sales/<int:id>')
 
 
 if __name__ == '__main__':
+    with app.app_context():  
+        db.create_all()  
     app.run(debug=True)
