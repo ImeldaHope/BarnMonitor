@@ -1,4 +1,3 @@
-// src/components/AddHealthRecord.jsx
 import React, { useState, useEffect } from 'react';
 
 const AddHealthRecord = () => {
@@ -9,67 +8,110 @@ const AddHealthRecord = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [healthRecords, setHealthRecords] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [editMode, setEditMode] = useState(false); // Track whether we are in edit mode
+  const [editRecordId, setEditRecordId] = useState(null); // Store the ID of the record being edited
 
-  // Fetch the list of health records after a successful submission
   const fetchHealthRecords = () => {
-    fetch('/api/health_records')
-      .then((res) => res.json())
-      .then((data) => setHealthRecords(data))
-      .catch((error) => console.error('Error:', error));
+    const mockHealthRecords = [
+      { id: 1, animal_id: 101, checkup_date: '2023-01-15', treatment: 'Vaccination', vet_name: 'Dr. Smith' },
+      { id: 2, animal_id: 102, checkup_date: '2023-02-20', treatment: 'Deworming', vet_name: 'Dr. Johnson' },
+      { id: 3, animal_id: 103, checkup_date: '2023-03-10', treatment: 'Regular Check-up', vet_name: 'Dr. Lee' }
+    ];
+    setHealthRecords(mockHealthRecords);
   };
 
   useEffect(() => {
-    fetchHealthRecords(); // Fetch the list on component mount
+    fetchHealthRecords();
   }, []);
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const record = { animal_id: animalId, checkup_date: checkupDate, treatment, vet_name: vetName };
-    
-    console.log("Sending record:", record);  // Log data before sending
-  
-    fetch('/api/health_records', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(record),
-    })
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error("Failed to submit health record");
-    })
-    .then((data) => {
-      setSuccessMessage('Health record added successfully!');
-      setErrorMessage('');
-      fetchHealthRecords(); // Refresh the list of health records
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-      setErrorMessage('Failed to add health record.');
-      setSuccessMessage('');
-    });
-  };
-  
-  // Handle delete functionality
-  const handleDelete = (id) => {
-    fetch(`/api/health_records/${id}`, {
-      method: 'DELETE',
-    })
-      .then((response) => {
-        if (response.ok) {
-          setHealthRecords(healthRecords.filter((record) => record.id !== id)); // Update the state
-        }
+
+    if (editMode) {
+      // Update existing record
+      fetch(`/api/health_records/${editRecordId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(record),
       })
+        .then((response) => response.json())
+        .then((data) => {
+          setSuccessMessage('Health record updated successfully!');
+          setEditMode(false);
+          setEditRecordId(null);
+          fetchHealthRecords();
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          setErrorMessage('Failed to update health record.');
+        });
+    } else {
+      // Add new record
+      fetch('/api/health_records', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(record),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setSuccessMessage('Health record added successfully!');
+          fetchHealthRecords();
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          setErrorMessage('Failed to add health record.');
+        });
+    }
+    // Clear form fields after submission
+    setAnimalId('');
+    setCheckupDate('');
+    setTreatment('');
+    setVetName('');
+  };
+
+  const handleDelete = (id) => {
+    fetch(`/api/health_records/${id}`, { method: 'DELETE' })
+      .then((response) => response.ok && setHealthRecords(healthRecords.filter(record => record.id !== id)))
       .catch((error) => console.error('Error:', error));
   };
 
+  const handleEdit = (record) => {
+    // Set the form with record's data and switch to edit mode
+    setAnimalId(record.animal_id);
+    setCheckupDate(record.checkup_date);
+    setTreatment(record.treatment);
+    setVetName(record.vet_name);
+    setEditMode(true);
+    setEditRecordId(record.id);
+  };
+
+  const handleSort = () => {
+    const sortedRecords = [...healthRecords].sort((a, b) => {
+      const dateA = new Date(a.checkup_date);
+      const dateB = new Date(b.checkup_date);
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+    setHealthRecords(sortedRecords);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
+  const filteredRecords = healthRecords.filter(
+    (record) =>
+      record.animal_id.toString().includes(searchTerm) ||
+      record.vet_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto p-6">
-      <h2 className="text-primary_1 font-black text-2xl mb-8">Add Health Record</h2>
+      <h2 className="text-primary_1 font-black text-2xl mb-8">{editMode ? 'Edit Health Record' : 'Add Health Record'}</h2>
 
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <div className="mb-4">
@@ -132,15 +174,26 @@ const AddHealthRecord = () => {
           type="submit"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
-          Add Record
+          {editMode ? 'Update Record' : 'Add Record'}
         </button>
       </form>
 
+      <button onClick={handleSort} className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+        Sort by Checkup Date ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
+      </button>
+
       {successMessage && <p className="text-green-500 text-xs italic">{successMessage}</p>}
       {errorMessage && <p className="text-red-500 text-xs italic">{errorMessage}</p>}
+\n
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search by Animal ID or Vet Name"
+        className="mb-4 shadow border rounded w-full py-2 px-3 text-gray-700"
+      />
 
-      <h2 className="text-primary_1 font-black text-2xl mb-8">Health Records</h2>
-      <table className="min-w-full bg-white shadow-md rounded mt-6" >
+      <table className="min-w-full bg-white shadow-md rounded mt-6">
         <thead>
           <tr>
             <th className="py-2 px-4 bg-gray-200">Animal ID</th>
@@ -151,13 +204,19 @@ const AddHealthRecord = () => {
           </tr>
         </thead>
         <tbody>
-          {healthRecords.map((record) => (
-            <tr key={record.id}>
-              <td className="py-2 px-4">{record.animal_id}</td>
-              <td className="py-2 px-4">{record.checkup_date}</td>
-              <td className="py-2 px-4">{record.treatment}</td>
-              <td className="py-2 px-4">{record.vet_name}</td>
-              <td className="py-2 px-4">
+          {filteredRecords.map((record) => (
+            <tr className="text-primary_1 font-black text-2xl mb-8" key={record.id}>
+              <td className="border px-4 py-2">{record.animal_id}</td>
+              <td className="border px-4 py-2">{record.checkup_date}</td>
+              <td className="border px-4 py-2">{record.treatment}</td>
+              <td className="border px-4 py-2">{record.vet_name}</td>
+              <td className="border px-4 py-2">
+                <button
+                  onClick={() => handleEdit(record)}
+                  className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded mr-2"
+                >
+                  Edit
+                </button>
                 <button
                   onClick={() => handleDelete(record.id)}
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
