@@ -44,6 +44,7 @@ form {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  display: flex;
 }
 
 input {
@@ -52,6 +53,7 @@ input {
   border: 1px solid #ccc;
   border-radius: 5px;
   width: 300px;
+  display: flex;
 }
 
 button {
@@ -65,4 +67,7 @@ button {
 
 p {
   margin-top: 15px;
+}
+#table{
+  display: flex;
 }
