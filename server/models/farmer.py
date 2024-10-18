@@ -4,6 +4,8 @@ from config import db, SerializerMixin
 class Farmer(db.Model, SerializerMixin):
     __tablename__ = 'farmers'
 
+    serialize_rules=('-animals.farmer',)
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)

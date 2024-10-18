@@ -5,6 +5,9 @@ import Dashboard from "./components/Dashboard";
 import AnimalTypeList from "./components/AnimalTypeList";
 import AddHealthRecord from "./components/AddHealthRecord";
 import SplashScreen from "./components/SplashScreen";
+import Sidebar from "./components/Sidebar";
+import Animals from "./components/Animals";
+import AnimalDetail from "./components/AnimalDetail";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 

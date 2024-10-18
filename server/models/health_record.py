@@ -5,6 +5,8 @@ from datetime import datetime
 class HealthRecord(db.Model, SerializerMixin):
     __tablename__ = 'health_records'
 
+    serialize_rules=('-animal.health_records',)
+
     id = db.Column(db.Integer, primary_key=True)
     animal_id = db.Column(db.Integer, db.ForeignKey('animals.id'), nullable=False)
     checkup_date = db.Column(db.DateTime)

@@ -5,6 +5,8 @@ from sqlalchemy.orm import relationship
 class Feed(db.Model, SerializerMixin):
     __tablename__ = 'feeds'  
 
+    serialize_rules=('animal.feed_records',)
+    
     id = Column(Integer, primary_key=True, autoincrement=True) 
     animal_id = Column(Integer, ForeignKey('animals.id'), nullable=False)  
     feed_type = Column(String, nullable=False)  

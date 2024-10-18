@@ -1,16 +1,8 @@
-<<<<<<<< HEAD:server/migrations/versions/b6f981edb2fd_initial.py
 """initial
 
-Revision ID: b6f981edb2fd
+Revision ID: 7524d0c6e02c
 Revises: 
-Create Date: 2024-10-18 02:13:22.242162
-========
-"""Initial migration
-
-Revision ID: f78b203e08f2
-Revises: 
-Create Date: 2024-10-17 18:19:00.183204
->>>>>>>> main:server/migrations/versions/f78b203e08f2_initial_migration.py
+Create Date: 2024-10-18 13:20:37.907858
 
 """
 from alembic import op
@@ -18,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:server/migrations/versions/b6f981edb2fd_initial.py
-revision = 'b6f981edb2fd'
-========
-revision = 'f78b203e08f2'
->>>>>>>> main:server/migrations/versions/f78b203e08f2_initial_migration.py
+revision = '7524d0c6e02c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -38,7 +26,7 @@ def upgrade():
     sa.UniqueConstraint('type_name', name=op.f('uq_animal_types_type_name'))
     )
     op.create_table('farmers',
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('phone', sa.String(), nullable=False),
@@ -50,10 +38,11 @@ def upgrade():
     op.create_table('animals',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
+    sa.Column('image', sa.String(), nullable=True),
     sa.Column('breed', sa.String(), nullable=True),
     sa.Column('age', sa.Integer(), nullable=True),
     sa.Column('health_status', sa.String(), nullable=True),
-    sa.Column('birth_date', sa.String(), nullable=True),
+    sa.Column('birth_date', sa.String(), nullable=False),
     sa.Column('farmer_id', sa.Integer(), nullable=True),
     sa.Column('animal_type_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['animal_type_id'], ['animal_types.id'], name=op.f('fk_animals_animal_type_id_animal_types')),
