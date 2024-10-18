@@ -1,20 +1,28 @@
-from config import db, SerializerMixin 
-from sqlalchemy import Column, Integer, String  
-from sqlalchemy.orm import relationship 
+# models/farmer.py
+from config import db, SerializerMixin
 
 class Farmer(db.Model, SerializerMixin):
     __tablename__ = 'farmers'
 
-    
-    id = Column(Integer, primary_key=True, autoincrement=True) 
-    name = Column(String, nullable=False)  
-    email = Column(String, nullable=False, unique=True)  
-    phone = Column(String, nullable=False)  
-    address = Column(String, nullable=True)  
-    password = Column(String, nullable=False)  
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
+    phone = db.Column(db.String, nullable=False)
+    address = db.Column(db.String)  # Add if needed
+    password = db.Column(db.String, nullable=False)
 
     # One-to-Many relationship with Animal
-    animals = relationship('Animal', back_populates='farmer', cascade='all, delete-orphan')
+    animals = db.relationship('Animal', back_populates='farmer', cascade='all, delete-orphan')
 
     def __repr__(self):
-        return f"<Farmer(id={self.id}, name='{self.name}', email='{self.email}', phone='{self.phone}')>"
+        return f'<Farmer {self.id} {self.name} {self.email}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'phone': self.phone,
+            'address': self.address,
+            'password': self.password  # Consider excluding sensitive data in the response
+        }

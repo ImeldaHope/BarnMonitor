@@ -5,9 +5,8 @@ from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 
-
-from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal  # Import all models
-from config import db,app, api  
+from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal, Feed  # Import all models
+from config import db, app, api  
 
 
 class Animals(Resource):
@@ -32,10 +31,9 @@ class Animals(Resource):
         except IntegrityError:
             return {'errors': '422 Unprocessable Entity'}, 422
 
-
         return make_response(jsonify(new_animal.to_dict()), 201)
 
-api.add_resource(Animals,'/animals')
+api.add_resource(Animals, '/animals')
 
 class AnimalById(Resource):
     def get(self, id):
@@ -78,9 +76,9 @@ class AnimalById(Resource):
         db.session.delete(animal)
         db.session.commit()
 
-        return make_response({"message":"no content"}, 204)
+        return make_response({"message": "no content"}, 204)
 
-api.add_resource(AnimalById,'/animals/<int:id>')
+api.add_resource(AnimalById, '/animals/<int:id>')
 
 
 @app.route('/signup', methods=['POST'])
@@ -102,6 +100,76 @@ def signup():
     except IntegrityError:
         db.session.rollback()
         return jsonify({'message': 'Email already exists!'}), 409
+
+
+# Farmer Resource
+class FarmerResource(Resource):
+    def get(self, id=None):
+        if id:
+            farmer = Farmer.query.get(id)
+            if farmer:
+                return jsonify(farmer.to_dict())
+            return jsonify({'message': 'Farmer not found'}), 404
+        else:
+            farmers = Farmer.query.all()
+            return jsonify([f.to_dict() for f in farmers])
+
+    def post(self):
+        data = request.get_json()
+        new_farmer = Farmer(
+            name=data['name'],
+            email=data['email'],
+            phone=data['phone']
+        )
+        db.session.add(new_farmer)
+        db.session.commit()
+        return jsonify({'message': 'Farmer added successfully', 'farmer': new_farmer.to_dict()}), 201
+
+    def delete(self, id):
+        farmer = Farmer.query.get(id)
+        if farmer:
+            db.session.delete(farmer)
+            db.session.commit()
+            return jsonify({'message': 'Farmer deleted successfully'})
+        return jsonify({'message': 'Farmer not found'}), 404
+
+api.add_resource(FarmerResource, '/farmers', '/farmers/<int:id>')
+
+
+# Feed Resource
+class FeedResource(Resource):
+    def get(self, id=None):
+        if id:
+            feed = Feed.query.get(id)
+            if feed:
+                return jsonify(feed.to_dict())
+            return jsonify({'message': 'Feed not found'}), 404
+        else:
+            feeds = Feed.query.all()
+            return jsonify([f.to_dict() for f in feeds])
+
+    def post(self):
+        data = request.get_json()
+        new_feed = Feed(
+            name=data['name'],
+            type=data['type'],
+            quantity=data['quantity'],
+            price=data['price'],
+            supplier=data.get('supplier', '')
+        )
+        db.session.add(new_feed)
+        db.session.commit()
+        return jsonify({'message': 'Feed added successfully', 'feed': new_feed.to_dict()}), 201
+
+    def delete(self, id):
+        feed = Feed.query.get(id)
+        if feed:
+            db.session.delete(feed)
+            db.session.commit()
+            return jsonify({'message': 'Feed deleted successfully'})
+        return jsonify({'message': 'Feed not found'}), 404
+
+api.add_resource(FeedResource, '/feeds', '/feeds/<int:id>')
 
 
 # AnimalType Resource (CRUD for Animal Types)
@@ -193,103 +261,115 @@ api.add_resource(HealthRecordResource, '/health_records', '/health_records/<int:
 
 
 
-#Production Routes
-@app.route('/productions', methods=['GET'])
-def get_productions():
-    productions = Production.query.all()
-    return jsonify([{
-        'id': p.id,
-        'animal_id': p.animal_id,
-        'product_type': p.product_type,
-        'quantity': p.quantity,
-        'production_date': p.production_date
-    } for p in productions])
+# Production Routes
+class ProductionResource(Resource):
+    def get(self, id=None):
+        if id:
+            production = Production.query.get(id)
+            if production:
+                return jsonify(production.to_dict())
+            return jsonify({'message': 'Production record not found'}), 404
+        else:
+            productions = Production.query.all()
+            return jsonify([p.to_dict() for p in productions])
 
-@app.route('/productions', methods=['POST'])
-def add_production():
-    data = request.get_json()
-    new_production = Production(
-        animal_id=data['animal_id'],
-        product_type=data['product_type'],
-        quantity=data['quantity'],
-        production_date=data['production_date']
-    )
-    db.session.add(new_production)
-    db.session.commit()
-    return jsonify({'message': 'Production record added successfully'})
-
-@app.route('/productions/<int:id>', methods=['PUT'])
-def update_production(id):
-    production = Production.query.get(id)
-    if production:
+    def post(self):
         data = request.get_json()
-        production.animal_id = data.get('animal_id', production.animal_id)
-        production.product_type = data.get('product_type', production.product_type)
-        production.quantity = data.get('quantity', production.quantity)
-        production.production_date = data.get('production_date', production.production_date)
+        new_production = Production(
+            animal_id=data['animal_id'],
+            product_type=data['product_type'],
+            quantity=data['quantity'],
+            production_date=data['production_date']
+        )
+        db.session.add(new_production)
         db.session.commit()
-        return jsonify({'message': 'Production record updated successfully'})
-    return jsonify({'message': 'Production record not found'}), 404
+        return jsonify(new_production.to_dict()), 201, 201
 
-@app.route('/productions/<int:id>', methods=['DELETE'])
-def delete_production(id):
-    production = Production.query.get(id)
-    if production:
-        db.session.delete(production)
+    def patch(self, id):
+        production = Production.query.get(id)
+        if not production:
+            return jsonify({'message': 'Production record not found'}), 404
+        
+        data = request.get_json()
+        if 'animal_id' in data:
+            production.animal_id = data['animal_id']
+        if 'product_type' in data:
+            production.product_type = data['product_type']
+        if 'quantity' in data:
+            production.quantity = data['quantity']
+        if 'production_date' in data:
+            production.production_date = data['production_date']
+
         db.session.commit()
-        return jsonify({'message': 'Production record deleted successfully'})
-    return jsonify({'message': 'Production record not found'}), 404
+        return jsonify({'message': 'Production record updated successfully'}), 200
 
+    def delete(self, id):
+        production = Production.query.get(id)
+        if production:
+            db.session.delete(production)
+            db.session.commit()
+            return jsonify({'message': 'Production record deleted successfully'})
+        return jsonify({'message': 'Production record not found'}), 404
+    
 # Sale Routes
-@app.route('/sales', methods=['GET'])
-def get_sales():
-    sales = Sale.query.all()
-    return jsonify([{
-        'id': s.id,
-        'animal_id': s.animal_id,
-        'product_type': s.product_type,
-        'quantity_sold': s.quantity_sold,
-        'sale_date': s.sale_date,
-        'amount': s.amount
-    } for s in sales])
+class SaleResource(Resource):
+    def get(self, id=None):
+        if id:
+            sale = Sale.query.get(id)
+            if sale:
+                return jsonify(sale.to_dict())
+            return jsonify({'message': 'Sale record not found'}), 404
+        else:
+            sales = Sale.query.all()
+            return jsonify([s.to_dict() for s in sales])
 
-@app.route('/sales', methods=['POST'])
-def add_sale():
-    data = request.get_json()
-    new_sale = Sale(
-        animal_id=data['animal_id'],
-        product_type=data['product_type'],
-        quantity_sold=data['quantity_sold'],
-        sale_date=data['sale_date'],
-        amount=data['amount']
-    )
-    db.session.add(new_sale)
-    db.session.commit()
-    return jsonify({'message': 'Sale record added successfully'})
-
-@app.route('/sales/<int:id>', methods=['PUT'])
-def update_sale(id):
-    sale = Sale.query.get(id)
-    if sale:
+    def post(self):
         data = request.get_json()
-        sale.animal_id = data.get('animal_id', sale.animal_id)
-        sale.product_type = data.get('product_type', sale.product_type)
-        sale.quantity_sold = data.get('quantity_sold', sale.quantity_sold)
-        sale.sale_date = data.get('sale_date', sale.sale_date)
-        sale.amount = data.get('amount', sale.amount)
+        new_sale = Sale(
+            animal_id=data['animal_id'],
+            product_type=data['product_type'],
+            quantity_sold=data['quantity_sold'],
+            sale_date=data['sale_date'],
+            amount=data['amount']
+        )
+        db.session.add(new_sale)
         db.session.commit()
-        return jsonify({'message': 'Sale record updated successfully'})
-    return jsonify({'message': 'Sale record not found'}), 404
+        return jsonify({'message': 'Sale record added successfully'}), 201
 
-@app.route('/sales/<int:id>', methods=['DELETE'])
-def delete_sale(id):
-    sale = Sale.query.get(id)
-    if sale:
-        db.session.delete(sale)
+    def patch(self, id):
+        sale = Sale.query.get(id)
+        if not sale:
+            return jsonify({'message': 'Sale record not found'}), 404
+        
+        data = request.get_json()
+        if 'animal_id' in data:
+            sale.animal_id = data['animal_id']
+        if 'product_type' in data:
+            sale.product_type = data['product_type']
+        if 'quantity_sold' in data:
+            sale.quantity_sold = data['quantity_sold']
+        if 'sale_date' in data:
+            sale.sale_date = data['sale_date']
+        if 'amount' in data:
+            sale.amount = data['amount']
+
         db.session.commit()
-        return jsonify({'message': 'Sale record deleted successfully'})
-    return jsonify({'message': 'Sale record not found'}), 404
+        return jsonify({'message': 'Sale record updated successfully'}), 200
+
+    def delete(self, id):
+        sale = Sale.query.get(id)
+        if sale:
+            db.session.delete(sale)
+            db.session.commit()
+            return jsonify({'message': 'Sale record deleted successfully'})
+        return jsonify({'message': 'Sale record not found'}), 404
+
+# Register API resources
+api.add_resource(ProductionResource, '/productions', '/productions/<int:id>')
+api.add_resource(SaleResource, '/sales', '/sales/<int:id>')
 
 
 if __name__ == '__main__':
+    with app.app_context():  
+        db.create_all()  
     app.run(debug=True)
