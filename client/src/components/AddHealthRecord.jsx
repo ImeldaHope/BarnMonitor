@@ -69,7 +69,7 @@ const AddHealthRecord = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6">Add Health Record</h2>
+      <h2 className="text-primary_1 font-black text-2xl mb-8">Add Health Record</h2>
 
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <div className="mb-4">
@@ -139,8 +139,8 @@ const AddHealthRecord = () => {
       {successMessage && <p className="text-green-500 text-xs italic">{successMessage}</p>}
       {errorMessage && <p className="text-red-500 text-xs italic">{errorMessage}</p>}
 
-      <h2 className="text-2xl font-bold mt-10">Health Records</h2>
-      <table className="min-w-full bg-white shadow-md rounded mt-6">
+      <h2 className="text-primary_1 font-black text-2xl mb-8">Health Records</h2>
+      <table className="min-w-full bg-white shadow-md rounded mt-6" >
         <thead>
           <tr>
             <th className="py-2 px-4 bg-gray-200">Animal ID</th>
