@@ -29,7 +29,7 @@ const App = () => {
             <Route path="/animal-types" element={<AnimalTypeList />} />
             <Route path="/health-records" element={<AddHealthRecord />} />
             <Route path="/animals" element={<Animals />} />
-            <Route path="/animal_detail" element={<AnimalDetail />} />
+            <Route path="/animal_detail/:animalId" element={<AnimalDetail />} />
           </Routes>
         </Router>
       </div>

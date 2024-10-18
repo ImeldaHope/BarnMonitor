@@ -1,90 +1,99 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label
   } from 'recharts';
+import { useParams } from "react-router-dom";
 
-function AnimalDetail({ animalId }) {
-  // const [animal, setAnimal] = useState({})
+function AnimalDetail() {
+  const [animal, setAnimal] = useState({
+    health_records: [],
+    production: [],
+    sales: [],
+    feed_records: [],
+    farmer:{},})
 
-  // useEffect(() => {
-  //     fetch(`http://localhost:5000/animals/${animalId}`)
-  //         .then(response => response.json())
-  //         .then(data => setAnimal(data))
-  //         .catch(error => console.error('Error fetching animals:', error));
-  // }, [animalId]);
+  const { animalId } = useParams();  
 
-  const animal = {
-    id: 1,
-    name: "Bessie",
-    breed: "Holstein",
-    age: 5,
-    health_status: "Healthy",
-    birth_date: "2019-05-15",
-    ownerId: 1,
-    owner: "Imelda",
-    health_records: [
-      {
-        id: 1,
-        animal_id: 1,
-        checkup_date: "2023-05-10",
-        treatment: "Vaccination",
-        notes: "Routine checkup",
-        vet_name: "Dr. Brown",
-      },
-      {
-        id: 2,
-        animal_id: 1,
-        checkup_date: "2023-06-15",
-        treatment: "Deworming",
-        notes: "Standard deworming treatment.",
-        vet_name: "Dr. Smith",
-      },
-      {
-        id: 3,
-        animal_id: 1,
-        checkup_date: "2023-08-20",
-        treatment: "Dental Checkup",
-        notes: "No issues found, teeth cleaning recommended.",
-        vet_name: "Dr. Lee",
-      },
-      {
-        id: 4,
-        animal_id: 1,
-        checkup_date: "2023-09-10",
-        treatment: "Health Examination",
-        notes: "Overall health check, vaccinations up to date.",
-        vet_name: "Dr. Adams",
-      },
-    ],
-    production: [
-      {
-        animal_id: 1,
-        product_type: "Milk",
-        quantity: 20.5,
-        production_date: "2023-10-01",
-      },
-      {
-        animal_id: 1,
-        product_type: "Milk",
-        quantity: 18,
-        production_date: "2023-10-02",
-      },
-      {
-        animal_id: 1,
-        product_type: "Milk",
-        quantity: 25,
-        production_date: "2023-10-03",
-      },
-    ],
-  };
+  useEffect(() => {      
+      fetch(`http://127.0.0.1:5000/animals/${animalId}`)
+          .then(response => response.json())
+          .then(data => setAnimal(data))
+          .catch(error => console.error('Error fetching animals:', error));
+  }, [animalId]);
+
+
+  // const animal = {
+  //   id: 1,
+  //   name: "Bessie",
+  //   breed: "Holstein",
+  //   age: 5,
+  //   health_status: "Healthy",
+  //   birth_date: "2019-05-15",
+  //   ownerId: 1,
+  //   owner: "Imelda",
+  //   health_records: [
+  //     {
+  //       id: 1,
+  //       animal_id: 1,
+  //       checkup_date: "2023-05-10",
+  //       treatment: "Vaccination",
+  //       notes: "Routine checkup",
+  //       vet_name: "Dr. Brown",
+  //     },
+  //     {
+  //       id: 2,
+  //       animal_id: 1,
+  //       checkup_date: "2023-06-15",
+  //       treatment: "Deworming",
+  //       notes: "Standard deworming treatment.",
+  //       vet_name: "Dr. Smith",
+  //     },
+  //     {
+  //       id: 3,
+  //       animal_id: 1,
+  //       checkup_date: "2023-08-20",
+  //       treatment: "Dental Checkup",
+  //       notes: "No issues found, teeth cleaning recommended.",
+  //       vet_name: "Dr. Lee",
+  //     },
+  //     {
+  //       id: 4,
+  //       animal_id: 1,
+  //       checkup_date: "2023-09-10",
+  //       treatment: "Health Examination",
+  //       notes: "Overall health check, vaccinations up to date.",
+  //       vet_name: "Dr. Adams",
+  //     },
+  //   ],
+  //   production: [
+  //     {
+  //       animal_id: 1,
+  //       product_type: "Milk",
+  //       quantity: 20.5,
+  //       production_date: "2023-10-01",
+  //     },
+  //     {
+  //       animal_id: 1,
+  //       product_type: "Milk",
+  //       quantity: 18,
+  //       production_date: "2023-10-02",
+  //     },
+  //     {
+  //       animal_id: 1,
+  //       product_type: "Milk",
+  //       quantity: 25,
+  //       production_date: "2023-10-03",
+  //     },
+  //   ],
+  // };
   
 
   return (
     <>
-      <div className="ml-60 mt-5">
+      <div className="ml-40 mt-5">
         <button className="bg-primary_2 hover:bg-secondary_1 rounded-lg p-2 text-xl">
           &larr; Back
-        </button>
+        </button>        
         <div className="flex mt-10">
           <img
             className="rounded-l-3xl ml-5 w-1/4"
@@ -108,7 +117,7 @@ function AnimalDetail({ animalId }) {
               <span className="font-semibold">D.O.B.:</span> {animal.birth_date}
             </p>
             <p className="text-secondary_2 text-lg">
-              <span className="font-semibold">My owner:</span> {animal.owner}
+              <span className="font-semibold">My owner:</span> {animal.farmer.name}
             </p>
             <div className="flex space-x-4 mt-4">
               <button className="bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out">Edit</button>
