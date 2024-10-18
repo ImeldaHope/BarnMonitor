@@ -3,10 +3,15 @@ export default {
   content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        farmGreen: '#4CAF50',
-        farmBrown: '#8B4513',
-        farmYellow: '#FFD700',
+      colors: {        
+        primary_1: '#027217',
+        primary_2: '#078C1D',
+        primary_3: '#34B85C',
+        primary_4: '#84A58A',
+        secondary_1: '#3051A5',
+        secondary_2: '#364145',
+        secondary_3: '#ABB9C5',
+        background: '#F1F4F9',
       },
     },
   },

@@ -3,6 +3,8 @@ from config import db, SerializerMixin
 class Animal(db.Model, SerializerMixin):
     __tablename__ = 'animals'
 
+    serialize_rules =('-farmer.animals','animal_type.animals','health_records.animal','production.animal','feed_records.animal','sales.animal',)
+
     id= db.Column(db.Integer, primary_key=True)
     name= db.Column(db.String, unique=True, nullable=False)    
     breed= db.Column(db.String)

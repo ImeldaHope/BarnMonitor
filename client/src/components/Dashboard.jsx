@@ -1,7 +1,12 @@
-// src/components/Dashboard.jsx
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react'
 
+<<<<<<< HEAD
+function Dashboard() {
+  return (
+    <div>Dashboard</div>
+  )
+}
+=======
 const Dashboard = () => {
   const handleLogout = () => {
     sessionStorage.clear();
@@ -35,5 +40,6 @@ const Dashboard = () => {
     </div>
   );
 };
+>>>>>>> main
 
-export default Dashboard;
+export default Dashboard
