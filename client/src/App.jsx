@@ -14,20 +14,18 @@ import Signup from "./components/Signup";
 const App = () => {
   return (
     <>
-      <div className='flex items-start'>
-        <div className='fixed top-0 left-0'>
-          <Sidebar/>
+      <div className="flex items-start">
+        <div className="fixed top-0 left-0">
+          <Sidebar />
         </div>
         <Router>
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<SplashScreen />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/animal-types" element={<AnimalTypeList />} />
-            <Route path="/health-records" element={<AddHealthRecord />} />
+            <Route path="/animal_types" element={<AnimalTypeList />} />
+            <Route path="/health_records" element={<AddHealthRecord />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/animal-types" element={<AnimalTypeList />} />
-            <Route path="/health-records" element={<AddHealthRecord />} />
             <Route path="/animals" element={<Animals />} />
             <Route path="/animal_detail/:animalId" element={<AnimalDetail />} />
           </Routes>
