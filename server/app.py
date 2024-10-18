@@ -11,9 +11,9 @@ from config import db, app, api
 
 class Animals(Resource):
     def get(self):
-        animals = [animal.to_dict() for animal in Animal.query.all()] 
-        return jsonify(animals), 200
-
+        animals = [animal.to_dict() for animal in Animal.query.all()]         
+        return make_response(jsonify(animals), 200  )         
+    
     def post(self):
         name = request.get_json()['name']
         breed = request.get_json()['breed']
@@ -106,9 +106,11 @@ def signup():
 class FarmerResource(Resource):
     def get(self, id=None):
         if id:
-            farmer = Farmer.query.get(id)
+            farmer = Farmer.query.get(id)            
             if farmer:
-                return jsonify(farmer.to_dict())
+                farmer_data=farmer.to_dict()
+                farmer_data['animals'] = [animal.to_dict() for animal in farmer.animals]                
+                return jsonify(farmer_data)
             return jsonify({'message': 'Farmer not found'}), 404
         else:
             farmers = Farmer.query.all()
@@ -182,7 +184,7 @@ class AnimalTypeResource(Resource):
             return jsonify({'message': 'Animal Type not found'}), 404
         else:
             types = AnimalType.query.all()
-            return jsonify([t.to_dict() for t in types])
+            return [t.to_dict() for t in types]
 
     def post(self):
         data = request.get_json()

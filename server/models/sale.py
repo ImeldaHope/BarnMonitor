@@ -6,6 +6,8 @@ from datetime import datetime
 class Sale(db.Model, SerializerMixin):
     __tablename__ = 'sales'
 
+    serialize_rules=('-animal.sales','-production.sales',)
+    
     id = db.Column(db.Integer, primary_key=True)
     animal_id = db.Column(db.Integer, db.ForeignKey('animals.id'), nullable=False)
     product_type = db.Column(db.String, nullable=False)

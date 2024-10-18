@@ -1,71 +1,70 @@
 import React, { useState, useEffect } from 'react'
 
 function Animals({farmerId}) {
-    // const [animals, setAnimals] = useState([])
+    const [animals, setAnimals] = useState([])
 
-    // useEffect(() => {
-    //     fetch(`http://localhost:5000/animals/${farmerId}`)
-    //         .then(response => response.json())
-    //         .then(data => setAnimals(data.animals))
-    //         .catch(error => console.error('Error fetching animals:', error));
-    // }, [farmerId]);
+    useEffect(() => {
+        fetch(`farmers/1`)
+            .then(response => response.json())
+            .then(data => setAnimals(data.animals))            
+    },[]);
 
-    const animals = [
-        {
-            id: 1,
-            name: 'Bessie',
-            breed: 'Holstein',
-            age: 5,
-            health_status: 'Healthy',
-            birth_date: '2019-05-15',
-            ownerId: 1
-        },
-        {
-            id: 2,
-            name: 'Daisy',
-            breed: 'Jersey',
-            age: 3,
-            health_status: 'Healthy',
-            birth_date: '2021-03-21',
-            ownerId: 1
-        },
-        {
-            id: 3,
-            name: 'Clucky',
-            breed: 'Leghorn',
-            age: 1,
-            health_status: 'Healthy',
-            birth_date: '2023-01-01',
-            ownerId: 2
-        },
-        {
-            id: 1,
-            name: 'Bessie',
-            breed: 'Holstein',
-            age: 5,
-            health_status: 'Healthy',
-            birth_date: '2019-05-15',
-            ownerId: 1
-        },
-        {
-            id: 2,
-            name: 'Daisy',
-            breed: 'Jersey',
-            age: 3,
-            health_status: 'Healthy',
-            birth_date: '2021-03-21',
-            ownerId: 1
-        },
-        {
-            id: 3,
-            name: 'Clucky',
-            breed: 'Leghorn',
-            age: 1,
-            health_status: 'Healthy',
-            birth_date: '2023-01-01',
-            ownerId: 2
-        }
-    ];
+    // const animals = [
+    //     {
+    //         id: 1,
+    //         name: 'Bessie',
+    //         breed: 'Holstein',
+    //         age: 5,
+    //         health_status: 'Healthy',
+    //         birth_date: '2019-05-15',
+    //         ownerId: 1
+    //     },
+    //     {
+    //         id: 2,
+    //         name: 'Daisy',
+    //         breed: 'Jersey',
+    //         age: 3,
+    //         health_status: 'Healthy',
+    //         birth_date: '2021-03-21',
+    //         ownerId: 1
+    //     },
+    //     {
+    //         id: 3,
+    //         name: 'Clucky',
+    //         breed: 'Leghorn',
+    //         age: 1,
+    //         health_status: 'Healthy',
+    //         birth_date: '2023-01-01',
+    //         ownerId: 2
+    //     },
+    //     {
+    //         id: 1,
+    //         name: 'Bessie',
+    //         breed: 'Holstein',
+    //         age: 5,
+    //         health_status: 'Healthy',
+    //         birth_date: '2019-05-15',
+    //         ownerId: 1
+    //     },
+    //     {
+    //         id: 2,
+    //         name: 'Daisy',
+    //         breed: 'Jersey',
+    //         age: 3,
+    //         health_status: 'Healthy',
+    //         birth_date: '2021-03-21',
+    //         ownerId: 1
+    //     },
+    //     {
+    //         id: 3,
+    //         name: 'Clucky',
+    //         breed: 'Leghorn',
+    //         age: 1,
+    //         health_status: 'Healthy',
+    //         birth_date: '2023-01-01',
+    //         ownerId: 2
+    //     }
+    // ];
     
   return (
     <>
