@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   Label,
   Line,
   LineChart,
@@ -14,10 +14,15 @@ import {
 } from "recharts";
 
 function Dashboard() {
+  const [farmerSales, setFarmerSales] = useState([]);
+  const [totalSales, setTotalSales] = useState(0);
+  const [farmer, setFarmer] = useState([]);
+  const [totalAnimals, setTotalAnimals] = useState(0);
+  const [farmerProduce, setFarmerProduce] = useState([]);
+  const [totalProduce, setTotalProduce] = useState(0);
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  //const [productionData, setProductionData] = useState([]);
 
   useEffect(() => {
     fetch(
@@ -40,330 +45,61 @@ function Dashboard() {
       });
   }, []);
 
-  // useEffect(() => {
-  //   // Fetch data from API
-  //   fetch('your-api-endpoint/farm-data')
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       // Process production data
-  //       const processedData = [];
+  //Fetching sales data for logged in farmer
+  useEffect(() => {
+    fetch(`http://127.0.0.1:5000/sales`)
+      .then((response) => response.json())
+      .then((data) => {
+        const farmerId = 2;
+        const filteredSales = data
+          .filter((sale) => sale.animal.farmer_id === farmerId)
+          .map((sale) => ({
+            saleDate: sale.sale_date,
+            amount: sale.amount,
+          }));
+        const amount = filteredSales.reduce(
+          (total, sale) => total + sale.amount,
+          0
+        );
+        const totalAmount = parseInt(amount, 10);
+        setTotalSales(totalAmount);
+        setFarmerSales(filteredSales);
+      });
+  }, []);
 
-  //       data.animals.forEach(animal => {
-  //         animal.production.forEach(record => {
-  //           const existingRecord = processedData.find(item => item.date === record.production_date);
-  //           if (existingRecord) {
-  //             existingRecord.quantity += record.quantity;
-  //           } else {
-  //             processedData.push({ date: record.production_date, quantity: record.quantity });
-  //           }
-  //         });
-  //       });
+  //Fetching produce for logged in farmer
+  useEffect(() => {
+    fetch(`http://127.0.0.1:5000/productions`)
+      .then((response) => response.json())
+      .then((data) => {
+        const farmerId = 2;
+        const filteredProduces = data
+          .filter((produce) => produce.animal.farmer_id === farmerId)
+          .map((produce) => ({
+            produceDate: produce.production_date,
+            quantity: produce.quantity,
+          }));
+        const produces = filteredProduces.reduce(
+          (total, produce) => total + produce.quantity,
+          0
+        );
 
-  //       // Sort by date for better chart display
-  //       processedData.sort((a, b) => new Date(a.date) - new Date(b.date));
+        setTotalProduce(produces);
+        setFarmerProduce(filteredProduces);
+      });
+  }, []);
 
-  //       setProductionData(processedData);
-  //     })
-  //     .catch(error => console.error('Error fetching farm data:', error));
-  // }, []);
-
-  const farmer = {
-    address: "123 Farm Lane",
-    animals: [
-      {
-        age: 5,
-        animal_type: {
-          description: "Dairy Cattle",
-          id: 1,
-          type_name: "Cow",
-        },
-        animal_type_id: 1,
-        birth_date: "2019-05-15",
-        breed: "Holstein",
-        farmer: {
-          address: "123 Farm Lane",
-          email: "john@example.com",
-          id: 1,
-          name: "John Doe",
-          password: "password123",
-          phone: "555-1234",
-        },
-        farmer_id: 1,
-        feed_records: [
-          {
-            animal_id: 1,
-            date: "2023-10-01",
-            feed_type: "Hay",
-            id: 1,
-            quantity: 10,
-          },
-        ],
-        health_records: [
-          {
-            animal_id: 1,
-            checkup_date: "2023-05-10 00:00:00",
-            id: 1,
-            notes: "Routine checkup",
-            treatment: "Vaccination",
-            vet_name: "Dr. Brown",
-          },
-        ],
-        health_status: "Healthy",
-        id: 1,
-        image:
-          "https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-nature-outdoors_23-2151294279.jpg?t=st=1729195647~exp=1729199247~hmac=ba449bfe6fe5b7ca4e316540d238d7a8768720bf9a3dda25ff4f4c4bf6e6f4b2&w=360",
-        name: "Bessie",
-        production: [
-          {
-            animal_id: 1,
-            id: 1,
-            product_type: "Milk",
-            production_date: "2023-10-01",
-            quantity: 20,
-            sales: [],
-          },
-          {
-            animal_id: 1,
-            id: 2,
-            product_type: "Milk",
-            production_date: "2023-10-02",
-            quantity: 18,
-            sales: [],
-          },
-        ],
-        sales: [
-          {
-            amount: 150.0,
-            animal_id: 1,
-            id: 1,
-            product_type: "Milk",
-            production: null,
-            production_id: null,
-            quantity_sold: 15,
-            sale_date: "2023-10-5",
-          },
-        ],
-      },
-      {
-        age: 3,
-        animal_type: {
-          description: "Dairy Cattle",
-          id: 1,
-          type_name: "Cow",
-        },
-        animal_type_id: 1,
-        birth_date: "2021-03-21",
-        breed: "Jersey",
-        farmer: {
-          address: "123 Farm Lane",
-          email: "john@example.com",
-          id: 1,
-          name: "John Doe",
-          password: "password123",
-          phone: "555-1234",
-        },
-        farmer_id: 1,
-        feed_records: [
-          {
-            animal_id: 2,
-            date: "2023-10-02",
-            feed_type: "Grain",
-            id: 2,
-            quantity: 8,
-          },
-        ],
-        health_records: [
-          {
-            animal_id: 2,
-            checkup_date: "2023-06-20 00:00:00",
-            id: 2,
-            notes: "Lack of appetite",
-            treatment: "Vitamin shot",
-            vet_name: "Dr. Taylor",
-          },
-        ],
-        health_status: "Healthy",
-        id: 2,
-        image:
-          "https://img.freepik.com/premium-photo/horse-field-against-clear-sky_1048944-12488816.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid",
-        name: "Daisy",
-        production: [
-          {
-            animal_id: 2,
-            id: 3,
-            product_type: "Milk",
-            production_date: "2023-10-03",
-            quantity: 25,
-            sales: [],
-          },
-        ],
-        sales: [
-          {
-            amount: 120.0,
-            animal_id: 2,
-            id: 2,
-            product_type: "Milk",
-            production: null,
-            production_id: null,
-            quantity_sold: 10,
-            sale_date: "2023-10-6",
-          },
-        ],
-      },
-    ],
-    email: "john@example.com",
-    id: 1,
-    name: "John Doe",
-    password: "password123",
-    phone: "555-1234",
-  };
-
-  const salesData = [
-    {
-      amount: 150.0,
-      animal: {
-        age: 5,
-        animal_type: {
-          description: "Dairy Cattle",
-          id: 1,
-          type_name: "Cow",
-        },
-        animal_type_id: 1,
-        birth_date: "2019-05-15",
-        breed: "Holstein",
-        farmer: {
-          address: "123 Farm Lane",
-          email: "john@example.com",
-          id: 1,
-          name: "John Doe",
-          password: "password123",
-          phone: "555-1234",
-        },
-        farmer_id: 1,
-        feed_records: [
-          {
-            animal_id: 1,
-            date: "2023-10-01",
-            feed_type: "Hay",
-            id: 1,
-            quantity: 10,
-          },
-        ],
-        health_records: [
-          {
-            animal_id: 1,
-            checkup_date: "2023-05-10 00:00:00",
-            id: 1,
-            notes: "Routine checkup",
-            treatment: "Vaccination",
-            vet_name: "Dr. Brown",
-          },
-        ],
-        health_status: "Healthy",
-        id: 1,
-        image:
-          "https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-nature-outdoors_23-2151294279.jpg?t=st=1729195647~exp=1729199247~hmac=ba449bfe6fe5b7ca4e316540d238d7a8768720bf9a3dda25ff4f4c4bf6e6f4b2&w=360",
-        name: "Bessie",
-        production: [
-          {
-            animal_id: 1,
-            id: 1,
-            product_type: "Milk",
-            production_date: "2023-10-01",
-            quantity: 20,
-            sales: [],
-          },
-          {
-            animal_id: 1,
-            id: 2,
-            product_type: "Milk",
-            production_date: "2023-10-02",
-            quantity: 18,
-            sales: [],
-          },
-        ],
-      },
-      animal_id: 1,
-      id: 1,
-      product_type: "Milk",
-      production: null,
-      production_id: null,
-      quantity_sold: 15,
-      sale_date: "2023-10-5",
-    },
-    {
-      amount: 120.0,
-      animal: {
-        age: 3,
-        animal_type: {
-          description: "Dairy Cattle",
-          id: 1,
-          type_name: "Cow",
-        },
-        animal_type_id: 1,
-        birth_date: "2021-03-21",
-        breed: "Jersey",
-        farmer: {
-          address: "123 Farm Lane",
-          email: "john@example.com",
-          id: 1,
-          name: "John Doe",
-          password: "password123",
-          phone: "555-1234",
-        },
-        farmer_id: 1,
-        feed_records: [
-          {
-            animal_id: 2,
-            date: "2023-10-02",
-            feed_type: "Grain",
-            id: 2,
-            quantity: 8,
-          },
-        ],
-        health_records: [
-          {
-            animal_id: 2,
-            checkup_date: "2023-06-20 00:00:00",
-            id: 2,
-            notes: "Lack of appetite",
-            treatment: "Vitamin shot",
-            vet_name: "Dr. Taylor",
-          },
-        ],
-        health_status: "Healthy",
-        id: 2,
-        image:
-          "https://img.freepik.com/premium-photo/horse-field-against-clear-sky_1048944-12488816.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid",
-        name: "Daisy",
-        production: [
-          {
-            animal_id: 2,
-            id: 3,
-            product_type: "Milk",
-            production_date: "2023-10-03",
-            quantity: 25,
-            sales: [],
-          },
-        ],
-      },
-      animal_id: 2,
-      id: 2,
-      product_type: "Milk",
-      production: null,
-      production_id: null,
-      quantity_sold: 10,
-      sale_date: "2023-10-6",
-    },
-  ];
-
-  const farmerId = 1;
-  const filteredSales = salesData
-    .filter((sale) => sale.animal.farmer_id === farmerId)
-    .map((sale) => ({
-      saleDate: sale.sale_date,
-      amount: sale.amount,
-    }));
+  //Fetching farmer
+  useEffect(() => {
+    fetch(`http://127.0.0.1:5000/farmers/2`)
+      .then((response) => response.json())
+      .then((data) => {
+        const animals = data.animals.length;
+        setFarmer(data);
+        setTotalAnimals(animals);
+      })
+      .catch((error) => console.error("Error fetching farmer:", error));
+  }, []);
 
   const getWeatherCondition = (weathercode) => {
     // Simple mapping for demonstration. Expand as needed based on actual weather codes.
@@ -427,7 +163,7 @@ function Dashboard() {
             <div className="relative border py-3 w-60 border-gray-300 rounded-lg text-center bg-gray-50 shadow-2xl max-w-xs mx-auto">
               <p className="">Total animals</p>
               <p className="text-secondary_1 font-semibold text-xl">
-                64 animals
+                {totalAnimals} animals
               </p>
               <p className="text-secondary_2">
                 <span className="text-primary_2 italic">+10% more</span> than
@@ -483,7 +219,9 @@ function Dashboard() {
             </div>
             <div className="relative border py-3 w-60 border-gray-300 rounded-lg text-center bg-gray-50 shadow-2xl max-w-xs mx-auto">
               <p className="">Revenue</p>
-              <p className="text-secondary_1 font-semibold text-xl">$64000</p>
+              <p className="text-secondary_1 font-semibold text-xl">
+                ${totalSales}
+              </p>
               <p className="text-secondary_2">
                 <span className="text-primary_2 italic">+70% more</span> than
                 last month
@@ -537,43 +275,6 @@ function Dashboard() {
               </div>
             </div>
           </div>
-        </div>
-        <div className="flex">
-          <div className="w-1/2">
-            <h1 className="text-secondary_1 text-xl font-semibold">
-              Sales Overview
-            </h1>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={filteredSales}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="saleDate">
-                  <Label
-                    value="Sales Date"
-                    offset={-5}
-                    position="insideBottom"
-                  />
-                </XAxis>
-                <YAxis>
-                  <Label
-                    value="Sales Amount"
-                    angle={-90}
-                    position="insideLeft"
-                  />
-                </YAxis>
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="amount"
-                  stroke="#3051A5"
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
           <div className="w-1/2">
             <div className="relative">
               <img
@@ -581,17 +282,71 @@ function Dashboard() {
                 src="https://img.freepik.com/premium-photo/three-bottles-milk-tree-stump-rural-setting_538547-4936.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid"
               />
               <div className="absolute border left-1/2 top-3/4 transform -translate-x-1/2 -translate-y-1/4 py-3 w-60 border-gray-300 rounded-lg text-center bg-gray-50 shadow-2xl max-w-xs mx-auto">
-                <p className="">Total animals</p>
+                <p className="">Production</p>
                 <p className="text-secondary_1 font-semibold text-xl">
-                  64 animals
+                  {totalProduce} litres
                 </p>
                 <p className="text-secondary_2">
-                  <span className="text-primary_2 italic">+10% more</span> than
+                  <span className="text-primary_2 italic">+15% more</span> than
                   last month
                 </p>
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="w-1/2">
+          <h1 className="text-secondary_1 text-xl font-semibold">
+            Sales Overview
+          </h1>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={farmerSales}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="saleDate">
+                <Label value="Sales Date" offset={-5} position="insideBottom" />
+              </XAxis>
+              <YAxis>
+                <Label value="Sales Amount" angle={-90} position="insideLeft" />
+              </YAxis>
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="amount"
+                stroke="#3051A5"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="w-1/2">
+          <h1 className="text-secondary_1 text-xl font-semibold">
+            Production Overview
+          </h1>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart
+              data={farmerProduce}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="produceDate">
+                <Label
+                  value="Production Date"
+                  offset={-5}
+                  position="insideBottom"
+                />
+              </XAxis>
+              <YAxis>
+                <Label value="Quantity" angle={-90} position="insideLeft" />
+              </YAxis>
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="quantity" fill="#3051A5" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </>
