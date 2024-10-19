@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from "react-router-dom";
 
 function Animals({farmerId}) {
-    const [animals, setAnimals] = useState([])
+    const [animals, setAnimals] = useState([])   
 
     useEffect(() => {
-        fetch(`farmers/1`)
+        fetch(`http://127.0.0.1:5000/farmers/1`)
             .then(response => response.json())
             .then(data => setAnimals(data.animals))            
     },[]);
 
+     
     // const animals = [
     //     {
     //         id: 1,
@@ -71,10 +73,15 @@ function Animals({farmerId}) {
       <div className="ml-60">
         <h1 className="font-extrabold text-primary_2 text-3xl pt-5">Animals</h1>
         <p className="text-secondary_1 font-semibold text-lg">
-          24 animals found
+          {animals.length} animals found
         </p>
         <div className="flex flex-wrap justify-start">
+        
           {animals.map((animal) => (
+            <Link 
+            to={`/animal_detail/${animal.id}`} 
+            key={animal.id} 
+            >
             <div
               key={animal.id}
               className="flex flex-col mx-5 my-5 bg-background rounded-3xl w-56 transition-transform duration-200 hover:ring-2 hover:ring-primary_3 hover:scale-105 hover:shadow-lg"
@@ -108,7 +115,9 @@ function Animals({farmerId}) {
                 </p>
               </div>
             </div>
+            </Link>
           ))}
+          
         </div>
       </div>
     </>

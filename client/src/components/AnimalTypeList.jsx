@@ -1,5 +1,6 @@
 // src/components/AnimalTypeList.jsx
 import React, { useState, useEffect } from 'react';
+import '../styles/type.css'
 
 const AnimalTypeList = () => {
   const [animalTypes, setAnimalTypes] = useState([]);

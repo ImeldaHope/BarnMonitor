@@ -110,7 +110,7 @@ class FarmerResource(Resource):
             if farmer:
                 farmer_data=farmer.to_dict()
                 farmer_data['animals'] = [animal.to_dict() for animal in farmer.animals]                
-                return jsonify(farmer_data)
+                return make_response(jsonify(farmer_data))
             return jsonify({'message': 'Farmer not found'}), 404
         else:
             farmers = Farmer.query.all()

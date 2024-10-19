@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/type.css'
 
 const Signup = () => {
   const [name, setName] = useState('');
