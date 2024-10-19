@@ -265,63 +265,30 @@ class HealthRecordResource(Resource):
         except Exception as e:
             return jsonify({'error': str(e)}), 500    
 
-    def put(self, id):
-        health_record = HealthRecord.query.get(id)
-        if health_record:
-            try:
-                data = request.get_json()
-
-                # Convert checkup_date from string to datetime object
-                if 'checkup_date' in data:
-                    health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
-
-                # Update other fields
-                health_record.animal_id = data.get('animal_id', health_record.animal_id)
-                health_record.treatment = data.get('treatment', health_record.treatment)
-                health_record.notes = data.get('notes', health_record.notes)
-                health_record.vet_name = data.get('vet_name', health_record.vet_name)
-
-                db.session.commit()
-
-                # Always return a proper JSON response
-                return jsonify({'message': 'Health record updated successfully', 'record': health_record.to_dict()}), 200
-
-            except ValueError as e:
-                return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
-        else:
-            return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
-
+    # Use PATCH for both full and partial updates
     def patch(self, id):
-        health_record = HealthRecord.query.get(id)
-        if health_record:
+        health_record = HealthRecord.query.filter_by(id=id).first()
+        if not health_record:
+            return make_response(jsonify({"message": "Health Record not found"}), 404)
+
+        data = request.get_json()
+        if 'animal_id' in data:
+            health_record.animal_id = data['animal_id']
+        if 'checkup_date' in data:
             try:
-                data = request.get_json()
-
-                # Update only the fields that are in the request
-                if 'checkup_date' in data:
-                    health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
-
-                if 'animal_id' in data:
-                    health_record.animal_id = data['animal_id']
-                if 'treatment' in data:
-                    health_record.treatment = data['treatment']
-                if 'notes' in data:
-                    health_record.notes = data['notes']
-                if 'vet_name' in data:
-                    health_record.vet_name = data['vet_name']
-
-                db.session.commit()
-
-                return jsonify({'message': 'Health record partially updated', 'record': health_record.to_dict()}), 200
-
+                health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
             except ValueError as e:
                 return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
-        else:
-            return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
+        if 'treatment' in data:
+            health_record.treatment = data['treatment']
+        if 'notes' in data:
+            health_record.notes = data['notes']
+        if 'vet_name' in data:
+            health_record.vet_name = data['vet_name']
+
+        db.session.commit()
+        return make_response(jsonify(health_record.to_dict()), 200)
+
 
 
     def delete(self, id):

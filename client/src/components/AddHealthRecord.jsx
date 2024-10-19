@@ -34,7 +34,7 @@ const AddHealthRecord = () => {
     if (editMode) {
       // Update existing record (PUT request)
       fetch(`http://127.0.0.1:5000/health_records/${editRecordId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
