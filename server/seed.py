@@ -1,8 +1,11 @@
-from datetime import date
+import random
 from models import AnimalType, HealthRecord, Farmer, Sale, Animal, Production, Feed
 from config import db, app
+from datetime import datetime, date, timedelta
+from faker import Faker
 
 def seed():
+    fake = Faker()
     with app.app_context():
         # Clear existing data (optional)
         db.session.query(Sale).delete()
@@ -13,44 +16,152 @@ def seed():
         db.session.query(AnimalType).delete()
         db.session.query(Farmer).delete()
 
-        # Farmers
-        farmer1 = Farmer(name="John Doe", email="john@example.com", phone="555-1234", address="123 Farm Lane", password="password123")
-        farmer2 = Farmer(name="Jane Smith", email="jane@example.com", phone="555-5678", address="456 Country Road", password="password456")
+        # Create 5 Farmers
+        farmers = []
+        for i in range(1, 6):
+            farmer = Farmer(
+                name=fake.name(),
+                email=fake.email(),
+                phone=fake.phone_number(),
+                address=fake.address(),
+                password="password123"
+            )
+            farmers.append(farmer)
 
-        # Animal Types
-        cow_type = AnimalType(type_name="Cow", description="Dairy Cattle")
-        chicken_type = AnimalType(type_name="Chicken", description="Broiler Chicken")
+        db.session.add_all(farmers)
+        db.session.commit()
 
-        # Animals
-        cow1 = Animal(name="Bessie", animal_type_id=1, age=5, image="https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-nature-outdoors_23-2151294279.jpg?t=st=1729195647~exp=1729199247~hmac=ba449bfe6fe5b7ca4e316540d238d7a8768720bf9a3dda25ff4f4c4bf6e6f4b2&w=360", farmer_id=1, health_status="Healthy", birth_date=date(2019, 5, 15), breed="Holstein")
-        cow2 = Animal(name="Daisy", animal_type_id=1, age=3, image="https://img.freepik.com/premium-photo/horse-field-against-clear-sky_1048944-12488816.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid", farmer_id=1, health_status="Healthy", birth_date=date(2021, 3, 21), breed="Jersey")
-        chicken1 = Animal(name="Clucky", animal_type_id=2, age=1, image="https://img.freepik.com/free-photo/close-up-beautiful-chicken_23-2150741649.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid", farmer_id=2, health_status="Healthy", birth_date=date(2023, 1, 1), breed="Leghorn")
+        #Animal Type
+        dairy_type = AnimalType(type_name="Dairy", description="Dairy animals for milk production")
+        beef_type = AnimalType(type_name="Beef", description="Beef animals for beef production")
+        types= [dairy_type, beef_type]
+        db.session.add_all(types)
+        db.session.commit()
 
-        # Health Records
-        health_record1 = HealthRecord(animal_id=1, checkup_date=date(2023, 5, 10), treatment="Vaccination", notes="Routine checkup", vet_name="Dr. Brown")
-        health_record2 = HealthRecord(animal_id=2, checkup_date=date(2023, 6, 20), treatment="Vitamin shot", notes="Lack of appetite", vet_name="Dr. Taylor")
+        # Dairy animal breeds
+        dairy_breeds = ["Holstein", "Jersey", "Guernsey", "Ayrshire", "Brown Swiss"]
 
-        # Production Records
-        production1 = Production(animal_id=1, product_type="Milk", quantity=20, production_date='2023-10-01')
-        production2 = Production(animal_id=1, product_type="Milk", quantity=18, production_date='2023-10-02')
-        production3 = Production(animal_id=2, product_type="Milk", quantity=25, production_date='2023-10-03')
+        def random_date_2019():
+            """Generates a random date in 2023 in the format 'YYYY-MM-DD'."""
+            random_day = random.randint(1, 365)
+            # Calculate the date by adding the random day to January 1, 2023
+            random_date = date(2019, 1, 1) + timedelta(days=random_day - 1)
+            return random_date
+        
+        def random_date_string_2021():
+            """Generates a random date in 2023 in the format 'YYYY-MM-DD' as a string."""
+            month = random.randint(1, 12)
+            day = random.randint(1, 28)
+            return f"2021-{month:02d}-{day:02d}"
+        
+        animal_images = [
+            "https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-nature-outdoors_23-2151294279.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid",  
+            "https://img.freepik.com/free-photo/photorealistic-view-cow-barn_23-2151294234.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid",  
+            "https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-nature-outdoors_23-2151294201.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid",  
+            "https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-outdoors_23-2151294223.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid",  
+            "https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-nature-outdoors_23-2151294266.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid"   
+        ]
 
-        # Feed Records
-        feed1 = Feed(animal_id=1, feed_type="Hay", quantity=10.0, date=date(2023, 10, 1))
-        feed2 = Feed(animal_id=2, feed_type="Grain", quantity=8.0, date=date(2023, 10, 2))
+        treatments = [
+            "Routine Checkup",
+            "Vaccination",
+            "Antibiotic Treatment",
+            "Deworming",
+            "Injury Treatment",
+            "Nutritional Supplement"
+        ]
 
-        # Sales Records
-        sale1 = Sale(animal_id=1, product_type="Milk", quantity_sold=15, sale_date='2023-10-5', amount=150.0)
-        sale2 = Sale(animal_id=2, product_type="Milk", quantity_sold=10, sale_date='2023-10-6', amount=120.0)
+        notes = [
+            "General health check",
+            "Administered annual vaccine",
+            "Treated for infection",
+            "Deworming completed",
+            "Minor injury to leg treated",
+            "Vitamin and mineral supplements given"
+        ]
 
-        # Adding data to the session
-        db.session.add_all([farmer1, farmer2])
-        db.session.add_all([cow_type, chicken_type])
-        db.session.add_all([cow1, cow2, chicken1])
-        db.session.add_all([health_record1, health_record2])
-        db.session.add_all([production1, production2, production3])
-        db.session.add_all([feed1, feed2])
-        db.session.add_all([sale1, sale2])
+        vet_names = [
+            "Dr. Brown",
+            "Dr. Smith",
+            "Dr. Johnson",
+            "Dr. Patel",
+            "Dr. Garcia",
+            "Dr. Lee"
+        ]
+
+        feeds = ["Hay", "Grain", "Silage", "Mineral Supplement", "Protein Supplement", "Grass", "Alfalfa", "Barley", "Corn", "Oats"]  
+        
+        # Add animals, health records, production records, feeds and sales for each farmer
+        for farmer in farmers:
+            num_animals = random.randint(5, 10)  # Between 10-20 animals per farmer
+            
+            animals = []
+            for j in range(num_animals):
+                animal_name = fake.name()
+
+                animal = Animal(
+                    name=animal_name,
+                    animal_type_id=random.choice(types).id,
+                    age=random.randint(2, 8),
+                    image=random.choice(animal_images),  
+                    farmer_id=farmer.id,
+                    health_status="Healthy",
+                    birth_date=random_date_2019(),
+                    breed=random.choice(dairy_breeds)
+                )
+                animals.append(animal)
+            
+            db.session.add_all(animals)
+            db.session.commit()
+                
+            # For each animal, create health records, production records, and sales records
+            for animal in animals:
+                health_records = []
+                for _ in range(5):  # At least 5 health records per animal
+                    health_record = HealthRecord(
+                        animal_id=animal.id,
+                        checkup_date=random_date_2019(),
+                        treatment=random.choice(treatments),
+                        notes=random.choice(notes),
+                        vet_name=random.choice(vet_names)
+                    )
+                    health_records.append(health_record)
+
+                production_records = []
+                for _ in range(15):  # At least 15 production records per animal
+                    production_record = Production(
+                        animal_id=animal.id,
+                        product_type="Milk",
+                        quantity=random.randint(15, 25),  # Random milk quantity
+                        production_date=random_date_string_2021()
+                    )
+                    production_records.append(production_record)
+
+                sales_records = []
+                for _ in range(10):  # At least 10 sales records per animal
+                    sale_record = Sale(
+                        animal_id=animal.id,
+                        product_type="Milk",
+                        quantity_sold=random.randint(10, 20),
+                        sale_date=random_date_string_2021(),
+                        amount=random.uniform(100, 200)
+                    )
+                    sales_records.append(sale_record)
+
+                feed_records = []
+                for _ in range(10):
+                    feed_record = Feed(
+                        animal_id=animal.id,
+                        feed_type=random.choice(feeds),
+                        quantity=random.randint(5,20),
+                        date=random_date_2019()
+                    )
+                    feed_records.append(feed_record)
+                # Add records to the session
+                db.session.add_all(health_records)
+                db.session.add_all(production_records)
+                db.session.add_all(sales_records)
+                db.session.add_all(feed_records)
 
         # Commit the transaction
         db.session.commit()
