@@ -1,3 +1,4 @@
+# models/animal_types.py
 from config import db, SerializerMixin
 
 class AnimalType(db.Model, SerializerMixin):

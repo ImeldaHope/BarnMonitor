@@ -25,3 +25,19 @@ body {
   min-height: 100vh;
 }
 
+.animal-type-container {
+  margin-left: 250px; /* Adjust the value according to the sidebar width */
+  padding: 20px; /* Optional padding */
+}
+
+@media (max-width: 768px) {
+  .animal-type-container {
+    margin-left: 200px; /* Adjust for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .animal-type-container {
+    margin-left: 150px; /* Further adjust for very small screens */
+  }
+}

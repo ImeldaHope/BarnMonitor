@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/type.css'
 
 const AddHealthRecord = () => {
   const [animalId, setAnimalId] = useState('');
@@ -11,30 +10,30 @@ const AddHealthRecord = () => {
   const [healthRecords, setHealthRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [editMode, setEditMode] = useState(false); // Track whether we are in edit mode
-  const [editRecordId, setEditRecordId] = useState(null); // Store the ID of the record being edited
+  const [editMode, setEditMode] = useState(false);
+  const [editRecordId, setEditRecordId] = useState(null);
 
-  const fetchHealthRecords = () => {
-    const mockHealthRecords = [
-      { id: 1, animal_id: 101, checkup_date: '2023-01-15', treatment: 'Vaccination', vet_name: 'Dr. Smith' },
-      { id: 2, animal_id: 102, checkup_date: '2023-02-20', treatment: 'Deworming', vet_name: 'Dr. Johnson' },
-      { id: 3, animal_id: 103, checkup_date: '2023-03-10', treatment: 'Regular Check-up', vet_name: 'Dr. Lee' }
-    ];
-    setHealthRecords(mockHealthRecords);
-  };
-
+  // Fetch health records from the API on component mount
   useEffect(() => {
     fetchHealthRecords();
   }, []);
 
+  // Function to fetch health records (GET request)
+  const fetchHealthRecords = () => {
+    fetch('http://127.0.0.1:5000/health_records')
+      .then((response) => response.json())
+      .then((data) => setHealthRecords(data))
+      .catch((error) => console.error('Error:', error));
+  };
+
+  // Handle form submission (POST or PUT request depending on edit mode)
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const record = { animal_id: animalId, checkup_date: checkupDate, treatment, vet_name: vetName };
 
     if (editMode) {
-      // Update existing record
-      fetch(`/api/health_records/${editRecordId}`, {
+      // Update existing record (PUT request)
+      fetch(`http://127.0.0.1:5000/health_records/${editRecordId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +41,7 @@ const AddHealthRecord = () => {
         body: JSON.stringify(record),
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then(() => {
           setSuccessMessage('Health record updated successfully!');
           setEditMode(false);
           setEditRecordId(null);
@@ -53,8 +52,8 @@ const AddHealthRecord = () => {
           setErrorMessage('Failed to update health record.');
         });
     } else {
-      // Add new record
-      fetch('/api/health_records', {
+      // Add new record (POST request)
+      fetch('http://127.0.0.1:5000/health_records', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +61,7 @@ const AddHealthRecord = () => {
         body: JSON.stringify(record),
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then(() => {
           setSuccessMessage('Health record added successfully!');
           fetchHealthRecords();
         })
@@ -71,21 +70,23 @@ const AddHealthRecord = () => {
           setErrorMessage('Failed to add health record.');
         });
     }
-    // Clear form fields after submission
+
+    // Clear form fields
     setAnimalId('');
     setCheckupDate('');
     setTreatment('');
     setVetName('');
   };
 
+  // Handle deleting a health record (DELETE request)
   const handleDelete = (id) => {
-    fetch(`/api/health_records/${id}`, { method: 'DELETE' })
-      .then((response) => response.ok && setHealthRecords(healthRecords.filter(record => record.id !== id)))
+    fetch(`http://127.0.0.1:5000/health_records/${id}`, { method: 'DELETE' })
+      .then((response) => response.ok && setHealthRecords(healthRecords.filter((record) => record.id !== id)))
       .catch((error) => console.error('Error:', error));
   };
 
+  // Handle editing a health record
   const handleEdit = (record) => {
-    // Set the form with record's data and switch to edit mode
     setAnimalId(record.animal_id);
     setCheckupDate(record.checkup_date);
     setTreatment(record.treatment);
@@ -94,6 +95,7 @@ const AddHealthRecord = () => {
     setEditRecordId(record.id);
   };
 
+  // Handle sorting health records by checkup date
   const handleSort = () => {
     const sortedRecords = [...healthRecords].sort((a, b) => {
       const dateA = new Date(a.checkup_date);
@@ -104,14 +106,14 @@ const AddHealthRecord = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
+  // Filter health records based on search term
   const filteredRecords = healthRecords.filter(
     (record) =>
-      record.animal_id.toString().includes(searchTerm) ||
-      record.vet_name.toLowerCase().includes(searchTerm.toLowerCase())
+      record.animal_id.toString().includes(searchTerm) || record.vet_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="animal-type-container container mx-auto p-6">
       <h2 className="text-primary_1 font-black text-2xl mb-8">{editMode ? 'Edit Health Record' : 'Add Health Record'}</h2>
 
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -185,7 +187,7 @@ const AddHealthRecord = () => {
 
       {successMessage && <p className="text-green-500 text-xs italic">{successMessage}</p>}
       {errorMessage && <p className="text-red-500 text-xs italic">{errorMessage}</p>}
-\n
+
       <input
         type="text"
         value={searchTerm}
