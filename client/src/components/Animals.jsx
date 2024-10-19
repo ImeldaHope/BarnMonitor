@@ -5,7 +5,7 @@ function Animals({farmerId}) {
     const [animals, setAnimals] = useState([])   
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:5000/farmers/1`)
+        fetch(`http://127.0.0.1:5000/farmers/2`)
             .then(response => response.json())
             .then(data => setAnimals(data.animals))            
     },[]);
@@ -75,6 +75,9 @@ function Animals({farmerId}) {
         <p className="text-secondary_1 font-semibold text-lg">
           {animals.length} animals found
         </p>
+        <div>
+          
+        </div>
         <div className="flex flex-wrap justify-start">
         
           {animals.map((animal) => (
@@ -88,11 +91,11 @@ function Animals({farmerId}) {
             >
               <div className="relative rounded-md ">
                 <p className="bg-primary_1 rounded-xl p-2 absolute top-0 right-0 m-2 text-white font-bold">
-                  Cow
+                  {animal.breed}
                 </p>
                 <img
                   className="rounded-3xl h-60 w-56"
-                  src="https://img.freepik.com/free-photo/photorealistic-view-cow-grazing-nature-outdoors_23-2151294279.jpg?t=st=1729195647~exp=1729199247~hmac=ba449bfe6fe5b7ca4e316540d238d7a8768720bf9a3dda25ff4f4c4bf6e6f4b2&w=360"
+                  src={animal.image}
                 />
               </div>
 
@@ -100,7 +103,7 @@ function Animals({farmerId}) {
                 <h1 className="px-5 text-primary_1 font-extrabold text-2xl">
                   {animal.name}
                 </h1>
-                <p className="px-5 text-secondary_2">{animal.breed}</p>
+                <p className="px-5 text-secondary_2">{animal.animal_type.type_name}</p>
               </div>
 
               <div className="flex flex-wrap gap-2 px-5 py-2">

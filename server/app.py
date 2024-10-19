@@ -153,11 +153,10 @@ class FeedResource(Resource):
     def post(self):
         data = request.get_json()
         new_feed = Feed(
-            name=data['name'],
-            type=data['type'],
+            animal_id=data['animal_id'],
+            date=data['date'],
             quantity=data['quantity'],
-            price=data['price'],
-            supplier=data.get('supplier', '')
+            feed_type=data['feed_type']            
         )
         db.session.add(new_feed)
         db.session.commit()
