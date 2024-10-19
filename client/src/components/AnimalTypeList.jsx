@@ -3,57 +3,47 @@ import React, { useState, useEffect } from 'react';
 
 const AnimalTypeList = () => {
   const [animalTypes, setAnimalTypes] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortOrder, setSortOrder] = useState('asc'); // for sorting
+  const [animals, setAnimals] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
 
+  // Fetch all animal types
   useEffect(() => {
-    // Simulate fetching animal types
-    const mockAnimalTypes = [
-      { id: 1, type_name: 'Cow', description: 'Produces milk and beef' },
-      { id: 2, type_name: 'Chicken', description: 'Lays eggs and produces meat' },
-      { id: 3, type_name: 'Sheep', description: 'Produces wool and meat' },
-    ];
-    setAnimalTypes(mockAnimalTypes);
+    fetch('http://127.0.0.1:5000/animal_types')
+      .then(response => response.json())
+      .then(data => setAnimalTypes(data));
   }, []);
 
-  const handleSort = () => {
-    const sortedAnimalTypes = [...animalTypes].sort((a, b) => {
-      const nameA = a.type_name.toLowerCase();
-      const nameB = b.type_name.toLowerCase();
-      return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-    });
-    setAnimalTypes(sortedAnimalTypes);
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  // Fetch animals by animal type
+  const handleTypeClick = (typeId) => {
+    fetch(`http://127.0.0.1:5000/animal_types/${typeId}`)
+      .then(response => response.json())
+      .then(data => {
+        setSelectedType(data.type);
+        setAnimals(data.animals);
+      });
   };
 
-  const filteredAnimalTypes = animalTypes.filter((type) =>
-    type.type_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
-    <div className="container mx-auto p-6">
-      <h2 className="text-primary_1 font-black text-2xl mb-8">Animal Types</h2>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search by Animal Type"
-        className="mb-4 shadow border rounded w-full py-2 px-3 text-gray-700"
-      />
-      <button onClick={handleSort} className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
-        Sort by Type Name ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
-      </button>
-      <ul className="bg-green-100 shadow-md rounded px-6 py-4 mt-4">
-        {filteredAnimalTypes.length > 0 ? (
-          filteredAnimalTypes.map((type) => (
-            <li key={type.id} className="border-b py-2">
-              <h2 className="text-primary_1 font-black text-2xl mb-8"><strong>{type.type_name}</strong> - {type.description}
-              </h2></li>
-          ))
-        ) : (
-          <p className="text-gray-600">No animal types available.</p>
-        )}
+    <div>
+      <h2>Animal Types</h2>
+      <ul>
+        {animalTypes.map(type => (
+          <li key={type.id} onClick={() => handleTypeClick(type.id)}>
+            {type.type_name}
+          </li>
+        ))}
       </ul>
+
+      {selectedType && (
+        <div>
+          <h3>{selectedType.type_name} Animals</h3>
+          <ul>
+            {animals.map(animal => (
+              <li key={animal.id}>{animal.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
