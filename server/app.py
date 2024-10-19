@@ -5,7 +5,6 @@ from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
-
 from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal, Feed  # Import all models
 from config import db, app, api  
 
@@ -21,8 +20,16 @@ class Animals(Resource):
         age = request.get_json()['age']
         health_status = request.get_json()['health_status']
         birth_date = request.get_json()['birth_date']
+        image = request.get_json()['image']
+        farmer_id = request.get_json()['farmer_id']
+        animal_type_id = request.get_json()['animal_type_id']
 
-        new_animal = Animal(name=name, breed=breed, age=age, health_status=health_status, birth_date=birth_date)
+        try:        
+            birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'error': 'Invalid date format. Please use YYYY-MM-DD'}), 400
+
+        new_animal = Animal(name=name, breed=breed, age=age, health_status=health_status, birth_date=birth_date, image=image, farmer_id=farmer_id, animal_type_id=animal_type_id)
 
         try:
             db.session.add(new_animal)
