@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 
 from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal, Feed  # Import all models
 from config import db, app, api  
@@ -181,17 +182,20 @@ class AnimalTypeResource(Resource):
             animal_type = AnimalType.query.get(id)
             if animal_type:
                 return jsonify(animal_type.to_dict())
-            return jsonify({'message': 'Animal Type not found'}), 404
+            return jsonify({'message': f'Animal Type with ID {id} does not exist'}), 404
         else:
             types = AnimalType.query.all()
-            return [t.to_dict() for t in types]
+            return jsonify([t.to_dict() for t in types])
 
     def post(self):
-        data = request.get_json()
-        new_type = AnimalType(type_name=data['type_name'], description=data.get('description', ''))
-        db.session.add(new_type)
-        db.session.commit()
-        return jsonify({'message': 'Animal Type added successfully'})
+        try:
+            data = request.get_json()
+            new_type = AnimalType(type_name=data['type_name'], description=data.get('description', ''))
+            db.session.add(new_type)
+            db.session.commit()
+            return jsonify({'message': 'Animal Type added successfully'})
+        except Exception as e:
+            return jsonify({'message': 'Error adding Animal Type', 'error': str(e)}), 500
 
     def put(self, id):
         animal_type = AnimalType.query.get(id)
@@ -201,7 +205,19 @@ class AnimalTypeResource(Resource):
             animal_type.description = data.get('description', animal_type.description)
             db.session.commit()
             return jsonify({'message': 'Animal Type updated successfully'})
-        return jsonify({'message': 'Animal Type not found'}), 404
+        return jsonify({'message': f'Animal Type with ID {id} does not exist'}), 404
+
+    def patch(self, id):
+        animal_type = AnimalType.query.get(id)
+        if animal_type:
+            data = request.get_json()
+            if 'type_name' in data:
+                animal_type.type_name = data['type_name']
+            if 'description' in data:
+                animal_type.description = data['description']
+            db.session.commit()
+            return jsonify({'message': 'Animal Type partially updated'})
+        return jsonify({'message': f'Animal Type with ID {id} does not exist'}), 404
 
     def delete(self, id):
         animal_type = AnimalType.query.get(id)
@@ -209,7 +225,7 @@ class AnimalTypeResource(Resource):
             db.session.delete(animal_type)
             db.session.commit()
             return jsonify({'message': 'Animal Type deleted successfully'})
-        return jsonify({'message': 'Animal Type not found'}), 404
+        return jsonify({'message': f'Animal Type with ID {id} does not exist'}), 404
 
 
 # HealthRecord Resource (CRUD for Health Records)
@@ -219,34 +235,95 @@ class HealthRecordResource(Resource):
             health_record = HealthRecord.query.get(id)
             if health_record:
                 return jsonify(health_record.to_dict())
-            return jsonify({'message': 'Health Record not found'}), 404
+            return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
         else:
             records = HealthRecord.query.all()
             return jsonify([r.to_dict() for r in records])
-
+        
     def post(self):
-        data = request.get_json()
-        new_record = HealthRecord(
-            animal_id=data['animal_id'],
-            checkup_date=data['checkup_date'],
-            treatment=data['treatment'],
-            vet_name=data['vet_name']
-        )
-        db.session.add(new_record)
-        db.session.commit()
-        return jsonify({'message': 'Health record added successfully'})
+        try:
+            data = request.get_json()
+
+            # Convert checkup_date from string to datetime object
+            checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
+
+            new_record = HealthRecord(
+                animal_id=data['animal_id'],
+                checkup_date=checkup_date,
+                treatment=data['treatment'],
+                notes=data.get('notes', ''),  # Optional field
+                vet_name=data['vet_name']
+            )
+
+            db.session.add(new_record)
+            db.session.commit()
+
+            return jsonify({'message': 'Health record added successfully', 'record': new_record.to_dict()})
+        except KeyError as e:
+            return jsonify({'error': f'Missing key: {str(e)}'}), 400
+        except ValueError as e:
+            return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500    
 
     def put(self, id):
         health_record = HealthRecord.query.get(id)
         if health_record:
-            data = request.get_json()
-            health_record.animal_id = data.get('animal_id', health_record.animal_id)
-            health_record.checkup_date = data.get('checkup_date', health_record.checkup_date)
-            health_record.treatment = data.get('treatment', health_record.treatment)
-            health_record.vet_name = data.get('vet_name', health_record.vet_name)
-            db.session.commit()
-            return jsonify({'message': 'Health record updated successfully'})
-        return jsonify({'message': 'Health record not found'}), 404
+            try:
+                data = request.get_json()
+
+                # Convert checkup_date from string to datetime object
+                if 'checkup_date' in data:
+                    health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
+
+                # Update other fields
+                health_record.animal_id = data.get('animal_id', health_record.animal_id)
+                health_record.treatment = data.get('treatment', health_record.treatment)
+                health_record.notes = data.get('notes', health_record.notes)
+                health_record.vet_name = data.get('vet_name', health_record.vet_name)
+
+                db.session.commit()
+
+                # Always return a proper JSON response
+                return jsonify({'message': 'Health record updated successfully', 'record': health_record.to_dict()}), 200
+
+            except ValueError as e:
+                return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
+
+    def patch(self, id):
+        health_record = HealthRecord.query.get(id)
+        if health_record:
+            try:
+                data = request.get_json()
+
+                # Update only the fields that are in the request
+                if 'checkup_date' in data:
+                    health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
+
+                if 'animal_id' in data:
+                    health_record.animal_id = data['animal_id']
+                if 'treatment' in data:
+                    health_record.treatment = data['treatment']
+                if 'notes' in data:
+                    health_record.notes = data['notes']
+                if 'vet_name' in data:
+                    health_record.vet_name = data['vet_name']
+
+                db.session.commit()
+
+                return jsonify({'message': 'Health record partially updated', 'record': health_record.to_dict()}), 200
+
+            except ValueError as e:
+                return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+        else:
+            return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
+
 
     def delete(self, id):
         health_record = HealthRecord.query.get(id)
@@ -254,12 +331,13 @@ class HealthRecordResource(Resource):
             db.session.delete(health_record)
             db.session.commit()
             return jsonify({'message': 'Health record deleted successfully'})
-        return jsonify({'message': 'Health record not found'}), 404
+        return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
 
 
 # Register API resources with their respective endpoints
 api.add_resource(AnimalTypeResource, '/animal_types', '/animal_types/<int:id>')
 api.add_resource(HealthRecordResource, '/health_records', '/health_records/<int:id>')
+
 
 
 

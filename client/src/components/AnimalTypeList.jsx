@@ -121,7 +121,7 @@ const AnimalTypeList = () => {
 
       {/* Add new animal type form */}
       <form onSubmit={handleAddType} className="mt-6">
-        <h3 className="text-xl mb-4">Add New Animal Type</h3>
+        <h3 className="text-primary_1 font-black text-2xl mb-8">Add New Animal Type</h3>
         <input
           type="text"
           name="type_name"
@@ -167,7 +167,7 @@ const AnimalTypeList = () => {
       {/* Edit animal type form */}
       {editType && (
         <form onSubmit={handleUpdateType} className="mt-6">
-          <h3 className="text-xl mb-4">Edit Animal Type</h3>
+          <h3 className="text-primary_1 font-black text-2xl mb-8">Edit Animal Type</h3>
           <input
             type="text"
             name="type_name"
