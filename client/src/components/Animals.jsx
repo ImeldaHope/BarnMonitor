@@ -70,7 +70,7 @@ function Animals({farmerId}) {
     
   return (
     <>
-      <div className="ml-40">
+      <div className="ml-60">
         <h1 className="font-extrabold text-primary_2 text-3xl pt-5">Animals</h1>
         <p className="text-secondary_1 font-semibold text-lg">
           {animals.length} animals found

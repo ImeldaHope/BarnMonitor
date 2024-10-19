@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/type.css'
 
 const AddHealthRecord = () => {
   const [animalId, setAnimalId] = useState('');

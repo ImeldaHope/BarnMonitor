@@ -1,6 +1,7 @@
 // src/components/Login.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../styles/type.css'
 
 const Login = () => {
   const [mobile, setMobile] = useState('');
@@ -22,7 +23,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h2 className='text-primary_1 text-2xl font-bold'>Login</h2>
       <form onSubmit={handleLogin}>
         <input
           type="text"

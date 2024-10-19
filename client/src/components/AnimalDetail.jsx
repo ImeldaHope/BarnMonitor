@@ -90,8 +90,8 @@ function AnimalDetail() {
 
   return (
     <>
-      <div className="ml-40 mt-5">
-        <button className="bg-primary_2 hover:bg-secondary_1 rounded-lg p-2 text-xl">
+      <div className="ml-60 mt-5">
+        <button className="bg-primary_2 text-gray-100 hover:bg-secondary_1 rounded-lg p-2 text-xl">
           &larr; Back
         </button>        
         <div className="flex mt-10">
@@ -120,8 +120,8 @@ function AnimalDetail() {
               <span className="font-semibold">My owner:</span> {animal.farmer.name}
             </p>
             <div className="flex space-x-4 mt-4">
-              <button className="bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out">Edit</button>
-              <button className="bg-red-600 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out">Delete</button> 
+              <button className=" text-gray-100 bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out">Edit</button>
+              <button className="text-gray-100 bg-red-600 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out">Delete</button> 
             </div>
             
           </div>
