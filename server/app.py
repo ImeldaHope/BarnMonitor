@@ -1,5 +1,5 @@
 # server/app.py
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, session
 from flask_bcrypt import Bcrypt
 from flask_restful import Resource
 from werkzeug.security import generate_password_hash
@@ -8,6 +8,49 @@ from datetime import datetime
 from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal, Feed  # Import all models
 from config import db, app, api  
 
+class Login(Resource):
+    def post(self):
+        user = Farmer.query.filter(
+            Farmer.email == request.get_json()['email'], 
+            Farmer.password == request.get_json()['password']
+        ).first()
+
+        if user:
+            session['user_id'] = user.id
+            print(f"Session created for user ID: {session['user_id']}")
+            return user.to_dict(), 200
+        else:
+            return jsonify({'message': 'Invalid email or password'}), 401        
+
+api.add_resource(Login, '/login', endpoint='login')
+
+class CheckSession(Resource):
+    def get(self):
+        user_session = session.get('user_id')
+        print(f"I am the user in check_session: {user_session}")
+
+        user = Farmer.query.filter(Farmer.id == session.get('user_id')).first()
+        if user:
+            return user.to_dict()
+        else:
+            return {'message': '401: Not Authorized'}, 401
+
+api.add_resource(CheckSession, '/check_session')
+
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return {'message': 'Logged out successfully'}, 200
+
+api.add_resource(Logout, '/logout')
+
+class ClearSession(Resource):
+
+    def delete(self):        
+        session['user_id'] = None
+        return {}, 204
+
+api.add_resource(ClearSession, '/clear_session')
 
 class Animals(Resource):
     def get(self):

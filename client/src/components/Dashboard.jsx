@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function Dashboard() {
+function Dashboard({farmerId}) {
   const [farmerSales, setFarmerSales] = useState([]);
   const [totalSales, setTotalSales] = useState(0);
   const [farmer, setFarmer] = useState([]);
@@ -49,8 +49,7 @@ function Dashboard() {
   useEffect(() => {
     fetch(`http://127.0.0.1:5000/sales`)
       .then((response) => response.json())
-      .then((data) => {
-        const farmerId = 2;
+      .then((data) => {        
         const filteredSales = data
           .filter((sale) => sale.animal.farmer_id === farmerId)
           .map((sale) => ({
@@ -71,8 +70,7 @@ function Dashboard() {
   useEffect(() => {
     fetch(`http://127.0.0.1:5000/productions`)
       .then((response) => response.json())
-      .then((data) => {
-        const farmerId = 2;
+      .then((data) => {        
         const filteredProduces = data
           .filter((produce) => produce.animal.farmer_id === farmerId)
           .map((produce) => ({
@@ -91,7 +89,7 @@ function Dashboard() {
 
   //Fetching farmer
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/farmers/2`)
+    fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
       .then((response) => response.json())
       .then((data) => {
         const animals = data.animals.length;
@@ -126,13 +124,13 @@ function Dashboard() {
 
   return (
     <>
-      <div className="ml-60 mt-5">
+      <div className="mt-5">
         <h1 className="font-extrabold text-primary_2 text-3xl pt-5">
           Dashboard
         </h1>
         <p>
           Good morning,{" "}
-          <span className="font-semibold italic">{farmer.name}</span>
+          <span className="font-semibold italic text-secondary_1">{farmer.name}</span>
         </p>
         <p>Checkout today's insights</p>
         <div className="flex flex-wrap justify-start py-5 px-5">
@@ -173,7 +171,7 @@ function Dashboard() {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 64 64"
-                  xml:space="preserve"
+                  xmlSpace="preserve"
                   style={{
                     fillRule: "evenodd",
                     clipRule: "evenodd",
@@ -230,7 +228,7 @@ function Dashboard() {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 64 64"
-                  xml:space="preserve"
+                  xmlSpace="preserve"
                   style={{
                     fillRule: "evenodd",
                     clipRule: "evenodd",
