@@ -12,8 +12,10 @@ function Animals({ farmerId }) {
     birth_date: ''
   });
 
+  console.log('My farmer id is', farmerId)
+  
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/farmers/2`)
+    fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
       .then((response) => response.json())
       .then((data) => setAnimals(data.animals));
   }, []);
@@ -123,7 +125,7 @@ function Animals({ farmerId }) {
 
   return (
     <>
-      <div className="ml-60">
+      <div className="">
         <h1 className="font-extrabold text-primary_2 text-3xl pt-5">Animals</h1>
         <p className="text-secondary_1 font-semibold text-lg">
           {animals.length} animals found

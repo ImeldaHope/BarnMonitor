@@ -131,7 +131,7 @@ function AnimalDetail() {
 
   return (
     <>
-      <div className="ml-60 mt-5">
+      <div className="mt-5">
         <button
           className="bg-primary_2 text-gray-100 hover:bg-secondary_1 rounded-lg p-2 text-xl"
           onClick={() => navigate(-1)}
