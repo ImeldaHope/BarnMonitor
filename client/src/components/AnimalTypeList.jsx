@@ -78,6 +78,7 @@ const AnimalTypeList = () => {
           value={typeName}
           onChange={(e) => setTypeName(e.target.value)}
           placeholder="Type Name"
+          className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
           required
         />
         <input
@@ -85,18 +86,20 @@ const AnimalTypeList = () => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description"
+          className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
         />
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Add Animal Type</button>
+        <button className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 mb-4" type="submit">Add Animal Type</button>
       </form>
       {successMessage && <p>{successMessage}</p>}
       {errorMessage && <p>{errorMessage}</p>}
       {loading && <p>Loading...</p>}
+      
       <ul>
         {animalTypes.map(type => (
           <li className="text-primary_1 font-black text-2xl mb-8" key={type.id}>
             {type.type_name}
-            <button className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => handleTypeClick(type.id)}>View Animals</button>
-            <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={() => handleDelete(type.id)}>Delete</button>
+            <button className="text-gray-100 bg-blue-600 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out flex space-x-4 mt-4" onClick={() => handleTypeClick(type.id)}>View Animals</button>
+            <button className="text-gray-100 bg-red-600 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out flex space-x-4 mt-4" onClick={() => handleDelete(type.id)}>Delete</button>
           </li>
         ))}
       </ul>
