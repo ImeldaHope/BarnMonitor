@@ -116,10 +116,10 @@ const AddHealthRecord = () => {
     <div className="animal-type-container container mx-auto p-6">
       <h2 className="text-primary_1 font-black text-2xl mb-8">{editMode ? 'Edit Health Record' : 'Add Health Record'}</h2>
 
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <form onSubmit={handleSubmit} className="flex flex-row justify-between items-center gap-6 p-4 bg-gray-100 shadow-lg rounded-lg w-full my-10">
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
-            Animal ID
+        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
+          <span className="block text-secondary_1 font-semibold mb-1">Animal ID</span>
           </label>
           <input
             type="text"
@@ -127,13 +127,13 @@ const AddHealthRecord = () => {
             value={animalId}
             onChange={(e) => setAnimalId(e.target.value)}
             required
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
           />
         </div>
 
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="checkup_date">
-            Checkup Date
+          <span className="block text-secondary_1 font-semibold mb-1">Checkup Date</span>
           </label>
           <input
             type="date"
@@ -141,13 +141,13 @@ const AddHealthRecord = () => {
             value={checkupDate}
             onChange={(e) => setCheckupDate(e.target.value)}
             required
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
           />
         </div>
 
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="treatment">
-            Treatment
+          <span className="block text-secondary_1 font-semibold mb-1">Treatment</span>
           </label>
           <input
             type="text"
@@ -155,13 +155,13 @@ const AddHealthRecord = () => {
             value={treatment}
             onChange={(e) => setTreatment(e.target.value)}
             required
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
           />
         </div>
 
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vet_name">
-            Vet Name
+          <span className="block text-secondary_1 font-semibold mb-1">Vet Name</span>
           </label>
           <input
             type="text"
@@ -169,60 +169,60 @@ const AddHealthRecord = () => {
             value={vetName}
             onChange={(e) => setVetName(e.target.value)}
             required
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200"
         >
           {editMode ? 'Update Record' : 'Add Record'}
         </button>
       </form>
 
-      <button onClick={handleSort} className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+      <button onClick={handleSort} className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 mb-4">
         Sort by Checkup Date ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
       </button>
 
-      {successMessage && <p className="text-green-500 text-xs italic">{successMessage}</p>}
-      {errorMessage && <p className="text-red-500 text-xs italic">{errorMessage}</p>}
-
+      {successMessage && <p className="text-green-500 text-xs italic mb-4">{successMessage}</p>}
+      {errorMessage && <p className="text-red-500 text-xs italic mb-4">{errorMessage}</p>}
+  
       <input
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Search by Animal ID or Vet Name"
-        className="mb-4 shadow border rounded w-full py-2 px-3 text-gray-700"
+        className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200 mb-4"
       />
 
-      <table className="min-w-full bg-white shadow-md rounded mt-6">
+      <table className="table-auto my-5 w-full bg-white shadow-lg rounded-lg overflow-hidden">
         <thead>
-          <tr>
-            <th className="py-2 px-4 bg-gray-200">Animal ID</th>
-            <th className="py-2 px-4 bg-gray-200">Checkup Date</th>
-            <th className="py-2 px-4 bg-gray-200">Treatment</th>
-            <th className="py-2 px-4 bg-gray-200">Vet Name</th>
-            <th className="py-2 px-4 bg-gray-200">Actions</th>
+          <tr className="bg-primary_1 text-white">
+            <th className="px-6 py-3 text-left">Animal ID</th>
+            <th className="px-6 py-3 text-left">Checkup Date</th>
+            <th className="px-6 py-3 text-left">Treatment</th>
+            <th className="px-6 py-3 text-left">Vet Name</th>
+            <th className="px-6 py-3 text-left">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {filteredRecords.map((record) => (
-            <tr className="text-primary_1 font-black text-2xl mb-8" key={record.id}>
-              <td className="border px-4 py-2">{record.animal_id}</td>
-              <td className="border px-4 py-2">{record.checkup_date}</td>
-              <td className="border px-4 py-2">{record.treatment}</td>
-              <td className="border px-4 py-2">{record.vet_name}</td>
-              <td className="border px-4 py-2">
+            <tr className="hover:bg-gray-50" key={record.id}>
+              <td className="px-6 py-4 text-secondary_2">{record.animal_id}</td>
+              <td className="px-6 py-4 text-secondary_2">{record.checkup_date}</td>
+              <td className="px-6 py-4 text-secondary_2">{record.treatment}</td>
+              <td className="px-6 py-4 text-secondary_2">{record.vet_name}</td>
+              <td className="px-6 py-4 text-secondary_2">
                 <button
                   onClick={() => handleEdit(record)}
-                  className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-2 rounded mr-2"
+                  className=" text-gray-100 bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(record.id)}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                  className="text-gray-100 bg-red-600 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out"
                 >
                   Delete
                 </button>
