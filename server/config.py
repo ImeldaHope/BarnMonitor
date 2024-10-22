@@ -30,7 +30,7 @@ app.json.compact = False
 
 app.config['SESSION_TYPE'] = 'filesystem'  
 app.config['SESSION_PERMANENT'] = True
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
 app.config['SESSION_USE_SIGNER'] = True  
 app.config['SESSION_FILE_DIR'] = './flask_session/' 
 app.config['SESSION_COOKIE_SAMESITE'] = 'None' 
@@ -38,7 +38,7 @@ app.config['SESSION_FILE_THRESHOLD'] = 100
 app.config['SESSION_COOKIE_NAME'] = 'barnmonitor_session'
 Session(app)
 
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, secure=True, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 migrate=Migrate(app, db)
 db.init_app(app)
