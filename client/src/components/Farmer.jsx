@@ -47,11 +47,30 @@ const FarmerProfile = () => {
             position: 'relative', // Ensures proper stacking context
             zIndex: 1, // Brings the profile to the front if necessary
         }}>
+<<<<<<< HEAD
             <h2 className='font-extrabold text-primary_2 text-3xl text-center pt-5'>Farmer Profile</h2>
             <div className='flex flex-col '>
                 <strong>Name:</strong> {farmer.name}            
                 <strong>Email:</strong> {farmer.email}            
                 <strong>Phone:</strong> {farmer.phone}            
+=======
+            <h2 style={{
+                color: '#027217',
+                fontSize: '28px', // Slightly reduced font size for better alignment
+                marginBottom: '20px',
+                textAlign: 'center', // Centered the heading
+            }}>Farmer Profile</h2>
+            <div>
+                <strong>Name:</strong> {farmer.name}
+            </div>
+            <div>
+                <strong>Email:</strong> {farmer.email}
+            </div>
+            <div>
+                <strong>Phone:</strong> {farmer.phone}
+            </div>
+            <div>
+>>>>>>> main
                 <strong>Address:</strong> {farmer.address}
             </div>
         </div>

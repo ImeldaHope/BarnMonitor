@@ -222,14 +222,22 @@ class FarmerResource(Resource):
         if id:
             # Fetch a specific farmer by ID
             farmer = Farmer.query.get(id)
+            # Fetch a specific farmer by ID
+            farmer = Farmer.query.get(id)
             if farmer:
+                farmer_data = farmer.to_dict()
+                farmer_data['animals'] = [animal.to_dict() for animal in farmer.animals]  # Assuming animals is a relationship
+                return farmer_data, 200  # Return dict directly with 200 status
+            return {'message': 'Farmer not found'}, 404  # Return a simple dict
                 farmer_data = farmer.to_dict()
                 farmer_data['animals'] = [animal.to_dict() for animal in farmer.animals]  # Assuming animals is a relationship
                 return farmer_data, 200  # Return dict directly with 200 status
             return {'message': 'Farmer not found'}, 404  # Return a simple dict
         else:
             # Fetch all farmers
+            # Fetch all farmers
             farmers = Farmer.query.all()
+            return [f.to_dict() for f in farmers], 200  # Return list of dicts directly
             return [f.to_dict() for f in farmers], 200  # Return list of dicts directly
 
     def delete(self, id):
@@ -251,6 +259,8 @@ api.add_resource(FarmerResource, '/farmers', '/farmers/<int:id>')
 class FeedResource(Resource):
     
     # GET request handler
+    
+    # GET request handler
     def get(self, id=None):
         if id:
             feed = Feed.query.get(id)
@@ -260,6 +270,8 @@ class FeedResource(Resource):
         else:
             feeds = Feed.query.all()
             return jsonify([f.to_dict() for f in feeds])
+    
+    # POST request handler
     
     # POST request handler
     def post(self):
@@ -272,11 +284,17 @@ class FeedResource(Resource):
         new_feed = Feed(
             animal_id=data['animal_id'],
             date=date_obj,
+            date=date_obj,
             quantity=data['quantity'],
+            feed_type=data['feed_type']
             feed_type=data['feed_type']
         )
         db.session.add(new_feed)
         db.session.commit()
+
+        return make_response(jsonify(new_feed.to_dict()), 201)
+    
+    # DELETE request handler
 
         return make_response(jsonify(new_feed.to_dict()), 201)
     
@@ -289,6 +307,8 @@ class FeedResource(Resource):
             return jsonify({'message': 'Feed deleted successfully'})
         return jsonify({'message': 'Feed not found'}), 404
 
+
+# Register the FeedResource with multiple routes
 
 # Register the FeedResource with multiple routes
 api.add_resource(FeedResource, '/feeds', '/feeds/<int:id>')

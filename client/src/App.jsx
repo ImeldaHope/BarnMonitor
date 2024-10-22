@@ -10,9 +10,17 @@ import Animals from "./components/Animals";
 import AnimalDetail from "./components/AnimalDetail";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+<<<<<<< HEAD
 import Production from "./components/Production";
 import Feed  from "./components/Feed";
 import FarmerProfile from  "./components/Farmer";
+=======
+<<<<<<< HEAD
+import Feed  from "./components/Feed";
+import FarmerProfile from  "./components/Farmer";
+=======
+>>>>>>> main
+>>>>>>> main
 
 import AuthProvider, {useAuth} from "./AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
@@ -37,8 +45,12 @@ const App = () => {
               <Route path="/health_records" element={<AddHealthRecord />} />
               <Route path="/profile" element={<FarmerProfile  />} />
               <Route path="/feeds" element={<Feed  />} />
+<<<<<<< HEAD
               <Route path="/sales" element={<Sales />} />
               <Route path="/production" element={<Production />} />
+=======
+              
+>>>>>>> main
               <Route path="/animals" element={<Animals />} />
               <Route path="/animal_detail/:animalId" element={<AnimalDetail />} />
               </Route>

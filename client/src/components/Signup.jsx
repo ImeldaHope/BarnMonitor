@@ -1,4 +1,13 @@
+<<<<<<< HEAD
+import React, { useState } from 'react';
+
+=======
 import React, { useState } from "react";
+<<<<<<< HEAD
+=======
+import "../styles/type.css";
+>>>>>>> main
+>>>>>>> main
 
 const Signup = () => {
   const [name, setName] = useState('');
