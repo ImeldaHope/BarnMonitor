@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faEdit, faTrash, faSort } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from "../AuthContext";
 
 const AddHealthRecord = () => {
   const [animalId, setAnimalId] = useState('');
@@ -13,7 +16,8 @@ const AddHealthRecord = () => {
   const [editMode, setEditMode] = useState(false);
   const [editRecordId, setEditRecordId] = useState(null);
 
-  const farmerId = 1;
+  const { user } = useAuth();
+  const farmerId = user?.id;
 
   const fetchHealthRecords = () => {
     fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
@@ -31,7 +35,6 @@ const AddHealthRecord = () => {
     }
   }, [farmerId]);
 
-  // Handle form submission for adding or updating health records
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -40,7 +43,7 @@ const AddHealthRecord = () => {
       checkup_date: checkupDate,
       treatment,
       vet_name: vetName,
-      farmer_id: farmerId, // Ensure farmerId is included
+      farmer_id: farmerId,
     };
 
     const requestMethod = editMode ? 'PATCH' : 'POST';
@@ -55,37 +58,28 @@ const AddHealthRecord = () => {
       },
       body: JSON.stringify(record),
     })
-      .then((response) => response.json())
       .then(() => {
-        setSuccessMessage(
-          editMode ? 'Health record updated successfully!' : 'Health record added successfully!'
-        );
+        setSuccessMessage(editMode ? 'Health record updated successfully!' : 'Health record added successfully!');
         setEditMode(false);
         setEditRecordId(null);
         fetchHealthRecords();
       })
-      .catch((error) => {
-        console.error('Error:', error);
+      .catch(() => {
         setErrorMessage(editMode ? 'Failed to update health record.' : 'Failed to add health record.');
       });
 
-    // Clear form fields
     setAnimalId('');
     setCheckupDate('');
     setTreatment('');
     setVetName('');
   };
 
-  // Handle deleting a health record (DELETE request)
   const handleDelete = (id) => {
     fetch(`http://127.0.0.1:5000/health_records/${id}`, { method: 'DELETE' })
-      .then((response) =>
-        response.ok && setHealthRecords(healthRecords.filter((record) => record.id !== id))
-      )
+      .then(() => setHealthRecords(healthRecords.filter((record) => record.id !== id)))
       .catch((error) => console.error('Error deleting health record:', error));
   };
 
-  // Handle editing a health record
   const handleEdit = (record) => {
     setAnimalId(record.animal_id);
     setCheckupDate(record.checkup_date);
@@ -95,7 +89,6 @@ const AddHealthRecord = () => {
     setEditRecordId(record.id);
   };
 
-  // Handle sorting health records by checkup date
   const handleSort = () => {
     const sortedRecords = [...healthRecords].sort((a, b) => {
       const dateA = new Date(a.checkup_date);
@@ -112,10 +105,7 @@ const AddHealthRecord = () => {
         {editMode ? 'Edit Health Record' : 'Add Health Record'}
       </h2>
 
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-row justify-between items-center gap-6 p-4 bg-gray-100 shadow-lg rounded-lg w-full my-10"
-      >
+      <form onSubmit={handleSubmit} className="flex flex-row justify-between items-center gap-6 p-4 bg-gray-100 shadow-lg rounded-lg w-full my-10">
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
             <span className="block text-secondary_1 font-semibold mb-1">Animal ID</span>
@@ -172,18 +162,14 @@ const AddHealthRecord = () => {
           />
         </div>
 
-        <button
-          type="submit"
-          className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200"
-        >
+        <button type="submit" className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 flex items-center">
+          <FontAwesomeIcon icon={faPlus} className="mr-2" />
           {editMode ? 'Update Record' : 'Add Record'}
         </button>
       </form>
 
-      <button
-        onClick={handleSort}
-        className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 mb-4"
-      >
+      <button onClick={handleSort} className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 mb-4 flex items-center">
+        <FontAwesomeIcon icon={faSort} className="mr-2" />
         Sort by Checkup Date ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
       </button>
 
@@ -202,7 +188,7 @@ const AddHealthRecord = () => {
 
       <table className="table-auto w-full my-6">
         <thead>
-          <tr className="bg-gray-200 text-secondary_2">
+          <tr className="bg-primary_1 text-white">
             <th className="px-4 py-2">Animal ID</th>
             <th className="px-4 py-2">Treatment</th>
             <th className="px-4 py-2">Vet</th>
@@ -212,33 +198,26 @@ const AddHealthRecord = () => {
         </thead>
         <tbody>
           {healthRecords.map((record) => (
-                        <tr key={record.id} className="text-secondary_2 bg-gray-50 hover:bg-gray-100">
+            <tr key={record.id} className="text-secondary_2 bg-gray-50 hover:bg-gray-100">
               <td className="border px-4 py-2">{record.animal_id}</td>
               <td className="border px-4 py-2">{record.treatment}</td>
               <td className="border px-4 py-2">{record.vet_name}</td>
               <td className="border px-4 py-2">{record.checkup_date}</td>
               <td className="border px-4 py-2">
-                <button
-                  onClick={() => handleEdit(record)}
-                  className="p-2 mx-2 text-primary_1 bg-secondary_1 rounded-lg"
-                >
-                  Edit
+                <button onClick={() => handleEdit(record)} className="text-white bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 flex items-center">
+                  <FontAwesomeIcon icon={faEdit} className="mr-2" /> Edit
                 </button>
-                <button
-                  onClick={() => handleDelete(record.id)}
-                  className="p-2 text-red-500 bg-gray-100 rounded-lg"
-                >
-                  Delete
+                <button onClick={() => handleDelete(record.id)} className="text-white bg-red-600 font-bold py-2 px-4 rounded hover:bg-red-700 transition duration-200 flex items-center">
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" /> Delete
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
     </div>
   );
 };
 
 export default AddHealthRecord;
-
-// IMPRESSED
