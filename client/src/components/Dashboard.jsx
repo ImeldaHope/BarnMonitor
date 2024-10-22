@@ -12,8 +12,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useAuth } from "../AuthContext";
 
-function Dashboard({farmerId}) {
+function Dashboard() {
+  const { user } = useAuth(); // Access the authenticated user
+  const farmerId = user?.id;
+
   const [farmerSales, setFarmerSales] = useState([]);
   const [totalSales, setTotalSales] = useState(0);
   const [farmer, setFarmer] = useState([]);
@@ -23,6 +27,7 @@ function Dashboard({farmerId}) {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     fetch(
@@ -122,6 +127,7 @@ function Dashboard({farmerId}) {
   // Add check for weather being null
   if (!weather) return <div>No weather data available.</div>;
 
+  
   return (
     <>
       <div className="mt-5">

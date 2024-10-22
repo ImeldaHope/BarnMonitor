@@ -1,37 +1,23 @@
 // src/components/Login.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../styles/type.css'
+import React, { useState, useEffect } from 'react';
+import {useAuth} from '../AuthContext'
 
-const Login = ({onLogin}) => {
+
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
- 
-  const navigate = useNavigate();
-
-  const handleLogin = (e) => {
-    console.log("I have been called")
+  
+  const auth = useAuth();
+  
+  const handleSubmit = (e) => {
+    
     e.preventDefault();
-
-    fetch("http://127.0.0.1:5000/login", {
-      method: "POST",      
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: 'include',
-      body: JSON.stringify({ email, password}),
-    })
-      .then((r) => {
-        if (r.ok) {
-          r.json().then((user) => {
-            console.log("I am the response user", user)
-            navigate("/dashboard")
-            onLogin(user)});
-        } else {
-          console.log("Log in fail")
-          throw new Error('Login failed');
-        }
-      })   
+    const input = {email:email, password:password}
+    if (input.email !== "" && input.password !== "") {
+      auth.handleLogin(input);
+      return;
+    }
+    alert("please provide a valid input");   
 
     
   };
@@ -39,7 +25,7 @@ const Login = ({onLogin}) => {
   return (
     <div className="flex flex-col justify-center items-center ms-72">
       <h2 className='text-primary_1 text-3xl font-bold p-5'>Login</h2>
-      <form onSubmit={handleLogin} className='p-3 w-96'>
+      <form onSubmit={handleSubmit} className='p-3 w-96'>
         <input
           type="text"
           placeholder="Email"

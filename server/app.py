@@ -4,9 +4,10 @@ from flask_bcrypt import Bcrypt
 from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
+from datetime import datetime, timedelta
 from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal, Feed  # Import all models
 from config import db, app, api  
+
 
 class Login(Resource):
     def post(self):
@@ -17,8 +18,10 @@ class Login(Resource):
 
         if user:
             session['user_id'] = user.id
+            print("Cookies received:", request.cookies)
             print(f"Session created for user ID: {session['user_id']}")
-            return user.to_dict(), 200
+            
+            return make_response(jsonify({'data': {'user': user.to_dict()},'token': session.sid }), 200)
         else:
             return jsonify({'message': 'Invalid email or password'}), 401        
 
@@ -26,19 +29,22 @@ api.add_resource(Login, '/login', endpoint='login')
 
 class CheckSession(Resource):
     def get(self):
-        user_session = session.get('user_id')
-        print(f"I am the user in check_session: {user_session}")
-
-        user = Farmer.query.filter(Farmer.id == session.get('user_id')).first()
-        if user:
-            return user.to_dict()
-        else:
-            return {'message': '401: Not Authorized'}, 401
+        user_id = session.get('user_id')
+        print("Cookies received:", request.cookies)
+        print(f"I am the user in check_session: {user_id}")
+        if user_id:
+            user = Farmer.query.get(user_id)
+                    
+            if user:
+                return user.to_dict()
+            else:
+                return {'message': '401: Not Authorized'}, 401
 
 api.add_resource(CheckSession, '/check_session')
 
 class Logout(Resource):
     def delete(self):
+        # print(f"Session deleted for user ID: {session['user_id']}")
         session['user_id'] = None
         return {'message': 'Logged out successfully'}, 200
 
