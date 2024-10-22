@@ -134,11 +134,11 @@ function Dashboard() {
         <h1 className="font-extrabold text-primary_2 text-3xl pt-5">
           Dashboard
         </h1>
-        <p>
+        <p className="text-slate-500">
           Good morning,{" "}
           <span className="font-semibold italic text-secondary_1">{farmer.name}</span>
         </p>
-        <p>Checkout today's insights</p>
+        <p className="text-slate-500">Checkout today's insights</p>
         <div className="flex py-5 px-5">
           <div className="border p-5 border-gray-300 rounded-lg text-center bg-gray-50 shadow-2xl max-w-xs mx-auto">
             <h2 className="text-xl text-primary_3 font-bold mb-2">Nairobi</h2>

@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faEdit, faTrash, faSort } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from "../AuthContext";
 
 const AddHealthRecord = () => {
   const [animalId, setAnimalId] = useState('');
@@ -13,79 +16,70 @@ const AddHealthRecord = () => {
   const [editMode, setEditMode] = useState(false);
   const [editRecordId, setEditRecordId] = useState(null);
 
-  // Fetch health records from the API on component mount
-  useEffect(() => {
-    fetchHealthRecords();
-  }, []);
+  const { user } = useAuth();
+  const farmerId = user?.id;
 
-  // Function to fetch health records (GET request)
   const fetchHealthRecords = () => {
-    fetch('http://127.0.0.1:5000/health_records')
+    fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
       .then((response) => response.json())
-      .then((data) => setHealthRecords(data))
-      .catch((error) => console.error('Error:', error));
+      .then((data) => {
+        const record_data = data.animals.flatMap((animal) => animal.health_records);
+        setHealthRecords(record_data);
+      })
+      .catch((error) => console.error('Error fetching health records:', error));
   };
 
-  // Handle form submission (POST or PUT request depending on edit mode)
+  useEffect(() => {
+    if (farmerId) {
+      fetchHealthRecords();
+    }
+  }, [farmerId]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const record = { animal_id: animalId, checkup_date: checkupDate, treatment, vet_name: vetName };
 
-    if (editMode) {
-      // Update existing record (PUT request)
-      fetch(`http://127.0.0.1:5000/health_records/${editRecordId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(record),
-      })
-        .then((response) => response.json())
-        .then(() => {
-          setSuccessMessage('Health record updated successfully!');
-          setEditMode(false);
-          setEditRecordId(null);
-          fetchHealthRecords();
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-          setErrorMessage('Failed to update health record.');
-        });
-    } else {
-      // Add new record (POST request)
-      fetch('http://127.0.0.1:5000/health_records', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(record),
-      })
-        .then((response) => response.json())
-        .then(() => {
-          setSuccessMessage('Health record added successfully!');
-          fetchHealthRecords();
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-          setErrorMessage('Failed to add health record.');
-        });
-    }
+    const record = {
+      animal_id: animalId,
+      checkup_date: checkupDate,
+      treatment,
+      vet_name: vetName,
+      farmer_id: farmerId,
+    };
 
-    // Clear form fields
+    const requestMethod = editMode ? 'PATCH' : 'POST';
+    const url = editMode
+      ? `http://127.0.0.1:5000/health_records/${editRecordId}`
+      : 'http://127.0.0.1:5000/health_records';
+
+    fetch(url, {
+      method: requestMethod,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(record),
+    })
+      .then(() => {
+        setSuccessMessage(editMode ? 'Health record updated successfully!' : 'Health record added successfully!');
+        setEditMode(false);
+        setEditRecordId(null);
+        fetchHealthRecords();
+      })
+      .catch(() => {
+        setErrorMessage(editMode ? 'Failed to update health record.' : 'Failed to add health record.');
+      });
+
     setAnimalId('');
     setCheckupDate('');
     setTreatment('');
     setVetName('');
   };
 
-  // Handle deleting a health record (DELETE request)
   const handleDelete = (id) => {
     fetch(`http://127.0.0.1:5000/health_records/${id}`, { method: 'DELETE' })
-      .then((response) => response.ok && setHealthRecords(healthRecords.filter((record) => record.id !== id)))
-      .catch((error) => console.error('Error:', error));
+      .then(() => setHealthRecords(healthRecords.filter((record) => record.id !== id)))
+      .catch((error) => console.error('Error deleting health record:', error));
   };
 
-  // Handle editing a health record
   const handleEdit = (record) => {
     setAnimalId(record.animal_id);
     setCheckupDate(record.checkup_date);
@@ -95,7 +89,6 @@ const AddHealthRecord = () => {
     setEditRecordId(record.id);
   };
 
-  // Handle sorting health records by checkup date
   const handleSort = () => {
     const sortedRecords = [...healthRecords].sort((a, b) => {
       const dateA = new Date(a.checkup_date);
@@ -106,20 +99,16 @@ const AddHealthRecord = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  // Filter health records based on search term
-  const filteredRecords = healthRecords.filter(
-    (record) =>
-      record.animal_id.toString().includes(searchTerm) || record.vet_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <div className="animal-type-container container mx-auto p-6">
-      <h2 className="text-primary_1 font-black text-2xl mb-8">{editMode ? 'Edit Health Record' : 'Add Health Record'}</h2>
+      <h2 className="text-primary_1 font-black text-2xl mb-8">
+        {editMode ? 'Edit Health Record' : 'Add Health Record'}
+      </h2>
 
       <form onSubmit={handleSubmit} className="flex flex-row justify-between items-center gap-6 p-4 bg-gray-100 shadow-lg rounded-lg w-full my-10">
         <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
-          <span className="block text-secondary_1 font-semibold mb-1">Animal ID</span>
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
+            <span className="block text-secondary_1 font-semibold mb-1">Animal ID</span>
           </label>
           <input
             type="text"
@@ -133,7 +122,7 @@ const AddHealthRecord = () => {
 
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="checkup_date">
-          <span className="block text-secondary_1 font-semibold mb-1">Checkup Date</span>
+            <span className="block text-secondary_1 font-semibold mb-1">Checkup Date</span>
           </label>
           <input
             type="date"
@@ -147,7 +136,7 @@ const AddHealthRecord = () => {
 
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="treatment">
-          <span className="block text-secondary_1 font-semibold mb-1">Treatment</span>
+            <span className="block text-secondary_1 font-semibold mb-1">Treatment</span>
           </label>
           <input
             type="text"
@@ -161,7 +150,7 @@ const AddHealthRecord = () => {
 
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vet_name">
-          <span className="block text-secondary_1 font-semibold mb-1">Vet Name</span>
+            <span className="block text-secondary_1 font-semibold mb-1">Vet Name</span>
           </label>
           <input
             type="text"
@@ -173,64 +162,60 @@ const AddHealthRecord = () => {
           />
         </div>
 
-        <button
-          type="submit"
-          className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200"
-        >
+        <button type="submit" className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 flex items-center">
+          <FontAwesomeIcon icon={faPlus} className="mr-2" />
           {editMode ? 'Update Record' : 'Add Record'}
         </button>
       </form>
 
-      <button onClick={handleSort} className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 mb-4">
+      <button onClick={handleSort} className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 mb-4 flex items-center">
+        <FontAwesomeIcon icon={faSort} className="mr-2" />
         Sort by Checkup Date ({sortOrder === 'asc' ? 'Ascending' : 'Descending'})
       </button>
 
       {successMessage && <p className="text-green-500 text-xs italic mb-4">{successMessage}</p>}
       {errorMessage && <p className="text-red-500 text-xs italic mb-4">{errorMessage}</p>}
-  
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search by Animal ID or Vet Name"
-        className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200 mb-4"
-      />
 
-      <table className="table-auto my-5 w-full bg-white shadow-lg rounded-lg overflow-hidden">
+      <div>
+        <input
+          type="text"
+          placeholder="Search by Animal ID or Vet Name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
+        />
+      </div>
+
+      <table className="table-auto w-full my-6">
         <thead>
           <tr className="bg-primary_1 text-white">
-            <th className="px-6 py-3 text-left">Animal ID</th>
-            <th className="px-6 py-3 text-left">Checkup Date</th>
-            <th className="px-6 py-3 text-left">Treatment</th>
-            <th className="px-6 py-3 text-left">Vet Name</th>
-            <th className="px-6 py-3 text-left">Actions</th>
+            <th className="px-4 py-2">Animal ID</th>
+            <th className="px-4 py-2">Treatment</th>
+            <th className="px-4 py-2">Vet</th>
+            <th className="px-4 py-2">Checkup Date</th>
+            <th className="px-4 py-2">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {filteredRecords.map((record) => (
-            <tr className="hover:bg-gray-50" key={record.id}>
-              <td className="px-6 py-4 text-secondary_2">{record.animal_id}</td>
-              <td className="px-6 py-4 text-secondary_2">{record.checkup_date}</td>
-              <td className="px-6 py-4 text-secondary_2">{record.treatment}</td>
-              <td className="px-6 py-4 text-secondary_2">{record.vet_name}</td>
-              <td className="px-6 py-4 text-secondary_2">
-                <button
-                  onClick={() => handleEdit(record)}
-                  className=" text-gray-100 bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out"
-                >
-                  Edit
+        <tbody>
+          {healthRecords.map((record) => (
+            <tr key={record.id} className="text-secondary_2 bg-gray-50 hover:bg-gray-100">
+              <td className="border px-4 py-2">{record.animal_id}</td>
+              <td className="border px-4 py-2">{record.treatment}</td>
+              <td className="border px-4 py-2">{record.vet_name}</td>
+              <td className="border px-4 py-2">{record.checkup_date}</td>
+              <td className="border px-4 py-2">
+                <button onClick={() => handleEdit(record)} className="text-white bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 flex items-center">
+                  <FontAwesomeIcon icon={faEdit} className="mr-2" /> Edit
                 </button>
-                <button
-                  onClick={() => handleDelete(record.id)}
-                  className="text-gray-100 bg-red-600 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 ease-in-out"
-                >
-                  Delete
+                <button onClick={() => handleDelete(record.id)} className="text-white bg-red-600 font-bold py-2 px-4 rounded hover:bg-red-700 transition duration-200 flex items-center">
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" /> Delete
                 </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
     </div>
   );
 };

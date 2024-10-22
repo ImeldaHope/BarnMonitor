@@ -1,29 +1,37 @@
 import React, { useState } from "react";
-import "../styles/type.css";
 
 const Signup = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [address, setAddress] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState(''); // State for address
+  const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("/signup", {
-      method: "POST",
+    fetch('http://127.0.0.1:5000/signup', {
+      method: 'POST',
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, phone, password, address }),
+      body: JSON.stringify({ name, email, phone, address, password }), // Include address in payload
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message === "Farmer signed up successfully!") {
-          alert("Sign Up Successful");
-        } else {
-          alert(data.message);
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.message === 'Farmer signed up successfully!') {
+          alert('Sign Up Successful');
+          // Optionally, redirect or clear form
+        } else {
+          alert(data.error || 'An error occurred while signing up. Please try again.'); // Handle error message
+        }
+      })
+      .catch((error) => {
+        alert(error.message); // Handle fetch errors
       });
   };
 
@@ -31,7 +39,7 @@ const Signup = () => {
     <div className="flex flex-col justify-center items-center ms-72">
       <h2 className="text-primary_1 text-3xl font-bold p-5">Sign Up</h2>
       <form onSubmit={handleSubmit} className="p-3 w-96">
-        <label>
+        <label className="my-5">
           <span className="block text-secondary_2 font-semibold mb-1">
             Name
           </span>
@@ -43,7 +51,7 @@ const Signup = () => {
             onChange={(e) => setName(e.target.value)}
           />
         </label>
-        <label>
+        <label className="my-5">
           <span className="block text-secondary_2 font-semibold mb-1">
             Email
           </span>
@@ -55,7 +63,7 @@ const Signup = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        <label>
+        <label className="my-5">
           <span className="block text-secondary_2 font-semibold mb-1">
             Phone
           </span>
@@ -67,7 +75,7 @@ const Signup = () => {
             onChange={(e) => setPhone(e.target.value)}
           />
         </label>
-        <label>
+        <label className="my-5">
           <span className="block text-secondary_2 font-semibold mb-1">
             Address
           </span>
@@ -79,7 +87,7 @@ const Signup = () => {
             onChange={(e) => setAddress(e.target.value)}
           />
         </label>
-        <label>
+        <label className="my-5">
           <span className="block text-secondary_2 font-semibold mb-1">
             Password
           </span>
@@ -93,16 +101,16 @@ const Signup = () => {
         </label>
         <button
           type="submit"
-          className="p-3 font-bold text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500"
+          className="mt-5 p-3 font-bold w-full text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500"
         >
           Sign Up
         </button>
       </form>
-      <p className=''>
+      <p className='text-secondary_2'>
         Already have an account?<a href="/login" className='text-secondary_1 underline font-normal'>Login</a>
       </p>
     </div>
   );
-};
 
-export default Signup;
+}
+export default  Signup;

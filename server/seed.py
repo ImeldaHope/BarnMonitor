@@ -3,6 +3,7 @@ from models import AnimalType, HealthRecord, Farmer, Sale, Animal, Production, F
 from config import db, app
 from datetime import datetime, date, timedelta
 from faker import Faker
+from werkzeug.security import generate_password_hash
 
 def seed():
     fake = Faker()
@@ -24,7 +25,7 @@ def seed():
                 email=fake.email(),
                 phone=fake.phone_number(),
                 address=fake.address(),
-                password="password123"
+                password=generate_password_hash("password123")
             )
             farmers.append(farmer)
 
