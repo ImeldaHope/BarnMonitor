@@ -1,29 +1,43 @@
+<<<<<<< HEAD
+import React, { useState } from 'react';
+
+=======
 import React, { useState } from "react";
 import "../styles/type.css";
+>>>>>>> main
 
 const Signup = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [address, setAddress] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState(''); // State for address
+  const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetch("/signup", {
-      method: "POST",
+    fetch('http://127.0.0.1:5000/signup', {
+      method: 'POST',
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, phone, password, address }),
+      body: JSON.stringify({ name, email, phone, address, password }), // Include address in payload
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message === "Farmer signed up successfully!") {
-          alert("Sign Up Successful");
-        } else {
-          alert(data.message);
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.message === 'Farmer signed up successfully!') {
+          alert('Sign Up Successful');
+          // Optionally, redirect or clear form
+        } else {
+          alert(data.error || 'An error occurred while signing up. Please try again.'); // Handle error message
+        }
+      })
+      .catch((error) => {
+        alert(error.message); // Handle fetch errors
       });
   };
 
@@ -103,6 +117,6 @@ const Signup = () => {
       </p>
     </div>
   );
-};
 
-export default Signup;
+}
+export default  Signup;
