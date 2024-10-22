@@ -5,11 +5,12 @@ import Dashboard from "./components/Dashboard";
 import AnimalTypeList from "./components/AnimalTypeList";
 import AddHealthRecord from "./components/AddHealthRecord";
 import SplashScreen from "./components/SplashScreen";
-import Sidebar from "./components/Sidebar";
+import Sales from "./components/Sales";
 import Animals from "./components/Animals";
 import AnimalDetail from "./components/AnimalDetail";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import Production from "./components/Production";
 
 import AuthProvider, {useAuth} from "./AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
@@ -26,12 +27,14 @@ const App = () => {
             <Routes>
               <Route path="/" element={<SplashScreen />} />
               <Route path="/signup" element={<Signup />} />
+              
               <Route element={<PrivateRoute />}> 
-                        
+              <Route path="/sales" element={<Sales />} />         
               <Route path="/dashboard" element={<Dashboard  />} />
               <Route path="/animal_types" element={<AnimalTypeList />} />
               <Route path="/health_records" element={<AddHealthRecord />} />
-              
+              <Route path="/sales" element={<Sales />} />
+              <Route path="/production" element={<Production />} />
               <Route path="/animals" element={<Animals />} />
               <Route path="/animal_detail/:animalId" element={<AnimalDetail />} />
               </Route>

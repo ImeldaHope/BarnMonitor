@@ -24,19 +24,19 @@ function Sidebar() {
                     <a href="/animal_types" className="hover:text-secondary_1 hover:font-bold">Animal Type</a>
                 </li>
                 <li>
-                    <a href="/feeds" className="hover:text-secondary_1 hover:font-bold">Feed</a>
-                </li>
+                    <a href="/sales" className="hover:text-secondary_1 hover:font-bold">Sale</a>
+                </li>                
                 <li>
                     <a href="/production" className="hover:text-secondary_1 hover:font-bold active:text-primary_2">Production</a>
                 </li>
                 <li>
                     <a href="/health_records" className="hover:text-secondary_1 hover:font-bold">Health Records</a>
+                </li>                
+                <li>
+                    <a href="/feeds" className="hover:text-secondary_1 hover:font-bold">Feed</a>
                 </li>
                 <li>
-                    <a href="/sales" className="hover:text-secondary_1 hover:font-bold">Sale</a>
-                </li>
-                <li>
-                    <a href="/farmer" className="hover:text-secondary_1 hover:font-bold">Profile</a>
+                    <a href="/profile" className="hover:text-secondary_1 hover:font-bold">Profile</a>
                 </li>
                 <li>
                     <a onClick={() => auth.handleLogOut()} href="/" className="p-2 font-bold text-white bg-secondary_1 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500">Logout</a>

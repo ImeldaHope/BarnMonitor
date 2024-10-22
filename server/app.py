@@ -385,7 +385,7 @@ class ProductionResource(Resource):
         )
         db.session.add(new_production)
         db.session.commit()
-        return jsonify(new_production.to_dict()), 201, 201
+        return make_response(jsonify(new_production.to_dict()), 201)
 
     def patch(self, id):
         production = Production.query.get(id)
@@ -403,7 +403,7 @@ class ProductionResource(Resource):
             production.production_date = data['production_date']
 
         db.session.commit()
-        return jsonify({'message': 'Production record updated successfully'}), 200
+        return make_response(jsonify(data), 201)
 
     def delete(self, id):
         production = Production.query.get(id)
@@ -436,7 +436,7 @@ class SaleResource(Resource):
         )
         db.session.add(new_sale)
         db.session.commit()
-        return jsonify({'message': 'Sale record added successfully'}), 201
+        return make_response(jsonify(new_sale.to_dict()), 201)
 
     def patch(self, id):
         sale = Sale.query.get(id)
@@ -456,7 +456,7 @@ class SaleResource(Resource):
             sale.amount = data['amount']
 
         db.session.commit()
-        return jsonify({'message': 'Sale record updated successfully'}), 200
+        return make_response(jsonify(sale.to_dict()), 201)
 
     def delete(self, id):
         sale = Sale.query.get(id)
