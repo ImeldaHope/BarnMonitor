@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 
+=======
+import React, { useState } from "react";
+import "../styles/type.css";
+>>>>>>> main
 
 const Signup = () => {
   const [name, setName] = useState('');

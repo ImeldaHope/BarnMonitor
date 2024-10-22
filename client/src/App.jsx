@@ -10,8 +10,11 @@ import Animals from "./components/Animals";
 import AnimalDetail from "./components/AnimalDetail";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+<<<<<<< HEAD
 import Feed  from "./components/Feed";
 import FarmerProfile from  "./components/Farmer";
+=======
+>>>>>>> main
 
 import AuthProvider, {useAuth} from "./AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
