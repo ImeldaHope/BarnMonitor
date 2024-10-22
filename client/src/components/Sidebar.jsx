@@ -1,13 +1,13 @@
 import React from "react";
+import { useAuth } from "../AuthContext";
 
-
-function Sidebar({onLogout}) {
-    function handleLogout() {
-        fetch("http://127.0.0.1:5000/logout", {
-          method: "DELETE",
-        }).then(() => onLogout());
-    }
-
+function Sidebar() {
+    // function handleLogout() {
+    //     fetch("http://127.0.0.1:5000/logout", {
+    //       method: "DELETE",
+    //     }).then(() => onLogout());
+    // }
+    const auth = useAuth();
   return (
     <>
     <nav className="bg-background h-screen p-6 shadow-2xl overflow-auto md:w-56">
@@ -39,7 +39,7 @@ function Sidebar({onLogout}) {
                     <a href="/farmer" className="hover:text-secondary_1 hover:font-bold">Profile</a>
                 </li>
                 <li>
-                    <a onClick={handleLogout} href="/" className="p-2 font-bold text-white bg-secondary_1 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500">Logout</a>
+                    <a onClick={() => auth.handleLogOut()} href="/" className="p-2 font-bold text-white bg-secondary_1 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500">Logout</a>
                 </li>
             </ul>
         </aside>
