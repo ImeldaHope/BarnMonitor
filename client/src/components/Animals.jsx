@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 
-function Animals({ farmerId }) {
+function Animals() {
   const [animals, setAnimals] = useState([]);
   const [newAnimal, setNewAnimal] = useState({
     name: '',
@@ -11,11 +12,22 @@ function Animals({ farmerId }) {
     health_status: '',
     birth_date: ''
   });
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const { user } = useAuth(); // Access the authenticated user
+  const farmerId = user?.id;
+  console.log(farmerId,'in animals jsx')
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/farmers/2`)
+    fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
       .then((response) => response.json())
-      .then((data) => setAnimals(data.animals));
+      .then((data) => setAnimals(data.animals))
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
   
   const handleInputChange = (e) => {
@@ -120,10 +132,11 @@ function Animals({ farmerId }) {
   //         ownerId: 2
   //     }
   // ];
-
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error fetching farmer animal data: {error}</div>;
   return (
     <>
-      <div className="ml-60">
+      <div className="">
         <h1 className="font-extrabold text-primary_2 text-3xl pt-5">Animals</h1>
         <p className="text-secondary_1 font-semibold text-lg">
           {animals.length} animals found

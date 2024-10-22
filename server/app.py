@@ -1,14 +1,63 @@
 # server/app.py
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, session
 from flask_bcrypt import Bcrypt
 from flask_restful import Resource
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime
+from datetime import datetime, timedelta
 from models import Farmer, AnimalType, HealthRecord, Production, Sale, Animal, Feed  # Import all models
 from config import db, app, api  
 import logging
 
+
+class Login(Resource):
+    def post(self):
+        user = Farmer.query.filter(
+            Farmer.email == request.get_json()['email'], 
+            Farmer.password == request.get_json()['password']
+        ).first()
+
+        if user:
+            session['user_id'] = user.id
+            print("Cookies received:", request.cookies)
+            print(f"Session created for user ID: {session['user_id']}")
+            
+            return make_response(jsonify({'data': {'user': user.to_dict()},'token': session.sid }), 200)
+        else:
+            return jsonify({'message': 'Invalid email or password'}), 401        
+
+api.add_resource(Login, '/login', endpoint='login')
+
+class CheckSession(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        print("Cookies received:", request.cookies)
+        print(f"I am the user in check_session: {user_id}")
+        if user_id:
+            user = Farmer.query.get(user_id)
+                    
+            if user:
+                return user.to_dict()
+            else:
+                return {'message': '401: Not Authorized'}, 401
+
+api.add_resource(CheckSession, '/check_session')
+
+class Logout(Resource):
+    def delete(self):
+        # print(f"Session deleted for user ID: {session['user_id']}")
+        session['user_id'] = None
+        return {'message': 'Logged out successfully'}, 200
+
+api.add_resource(Logout, '/logout')
+
+class ClearSession(Resource):
+
+    def delete(self):        
+        session['user_id'] = None
+        return {}, 204
+
+api.add_resource(ClearSession, '/clear_session')
 
 class Animals(Resource):
     def get(self):
@@ -336,63 +385,30 @@ class HealthRecordResource(Resource):
         except Exception as e:
             return jsonify({'error': str(e)}), 500    
 
-    def put(self, id):
-        health_record = HealthRecord.query.get(id)
-        if health_record:
-            try:
-                data = request.get_json()
-
-                # Convert checkup_date from string to datetime object
-                if 'checkup_date' in data:
-                    health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
-
-                # Update other fields
-                health_record.animal_id = data.get('animal_id', health_record.animal_id)
-                health_record.treatment = data.get('treatment', health_record.treatment)
-                health_record.notes = data.get('notes', health_record.notes)
-                health_record.vet_name = data.get('vet_name', health_record.vet_name)
-
-                db.session.commit()
-
-                # Always return a proper JSON response
-                return jsonify({'message': 'Health record updated successfully', 'record': health_record.to_dict()}), 200
-
-            except ValueError as e:
-                return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
-        else:
-            return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
-
+    # Use PATCH for both full and partial updates
     def patch(self, id):
-        health_record = HealthRecord.query.get(id)
-        if health_record:
+        health_record = HealthRecord.query.filter_by(id=id).first()
+        if not health_record:
+            return make_response(jsonify({"message": "Health Record not found"}), 404)
+
+        data = request.get_json()
+        if 'animal_id' in data:
+            health_record.animal_id = data['animal_id']
+        if 'checkup_date' in data:
             try:
-                data = request.get_json()
-
-                # Update only the fields that are in the request
-                if 'checkup_date' in data:
-                    health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
-
-                if 'animal_id' in data:
-                    health_record.animal_id = data['animal_id']
-                if 'treatment' in data:
-                    health_record.treatment = data['treatment']
-                if 'notes' in data:
-                    health_record.notes = data['notes']
-                if 'vet_name' in data:
-                    health_record.vet_name = data['vet_name']
-
-                db.session.commit()
-
-                return jsonify({'message': 'Health record partially updated', 'record': health_record.to_dict()}), 200
-
+                health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
             except ValueError as e:
                 return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
-        else:
-            return jsonify({'message': f'Health Record with ID {id} does not exist'}), 404
+        if 'treatment' in data:
+            health_record.treatment = data['treatment']
+        if 'notes' in data:
+            health_record.notes = data['notes']
+        if 'vet_name' in data:
+            health_record.vet_name = data['vet_name']
+
+        db.session.commit()
+        return make_response(jsonify(health_record.to_dict()), 200)
+
 
 
     def delete(self, id):

@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from "../AuthContext";
 
-const FarmerProfile = ({ farmerId }) => {
+const FarmerProfile = () => {
     const [farmer, setFarmer] = useState(null);
     const [error, setError] = useState(null);
-
+    const { user } = useAuth(); // Access the authenticated user
+    const farmerId = user?.id;
     useEffect(() => {
         const fetchFarmer = async () => {
             try {
                 console.log('Fetching farmer with ID:', farmerId);
-                const response = await fetch(`http://127.0.0.1:5000/farmers/1`);
+                const response = await fetch(`http://127.0.0.1:5000/farmers/${farmerId}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
