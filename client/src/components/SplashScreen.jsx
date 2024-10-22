@@ -1,7 +1,7 @@
 // src/components/SplashScreen.jsx
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import '../styles/type.css'
+import logo from '../assets/barnmonitor-logo.svg';
 
 const SplashScreen = () => {
   const navigate = useNavigate();
@@ -15,15 +15,16 @@ const SplashScreen = () => {
   }, [navigate]);
 
   return (
-    <div className="splash-container">
-      <img
-        src="/src/assets/farmgenics_logo.png"
-        alt="FarmGenics Logo"
-        className="splash-logo"
-      />
-      <h1>FarmGenics</h1>
-      <p>Cattle Management made easier</p>
-    </div>
+    <>
+      <div className="flex justify-center items-center ms-80 ">
+        <img
+          src={logo}
+          alt="barn-monitor-logo"
+          className="w-full h-full max-w-xs max-h-xs"
+        />        
+      </div>
+    </>
+    
   );
 };
 
