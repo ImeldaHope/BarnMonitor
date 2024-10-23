@@ -1,18 +1,24 @@
 import React from "react";
 import { useAuth } from "../AuthContext";
+import logo from '../assets/barnmonitor-logo.svg';
 
 function Sidebar() {
-    // function handleLogout() {
-    //     fetch("http://127.0.0.1:5000/logout", {
-    //       method: "DELETE",
-    //     }).then(() => onLogout());
-    // }
+   
     const auth = useAuth();
+
   return (
     <>
     <nav className="bg-background h-screen p-6 shadow-2xl overflow-auto md:w-56">
-        <aside className="flex flex-col justify-center items-center h-full p-30">
-            <a href="/dashboard"><h1 className="text-primary_1 font-black text-2xl mb-8">Barn Monitor</h1></a>
+        <aside className="flex flex-col justify-center items-center h-full p-30">            
+            <div className='flex items-center justify-center mb-5'>
+                <a href="/dashboard">
+                    <img
+                        src={logo}
+                        alt="barn-monitor-logo"
+                        className="w-[60%] h-[60%] ms-7"
+                    />
+                </a> 
+            </div>
             <ul className="space-y-4 text-lg text-gray-700">                
                 <li>
                     <a href="/dashboard" className="hover:text-secondary_1 hover:font-bold">Dashboard</a>

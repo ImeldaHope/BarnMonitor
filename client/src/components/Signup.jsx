@@ -1,55 +1,40 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
-
-=======
-import React, { useState } from "react";
-<<<<<<< HEAD
-=======
-import "../styles/type.css";
->>>>>>> main
->>>>>>> main
+import logo from '../assets/barnmonitor-logo.svg';
+import {useAuth} from '../AuthContext';
 
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState(''); // State for address
+  const [address, setAddress] = useState(''); 
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const auth = useAuth();
+  
+  const handleSubmit = (e) => {   
+
     e.preventDefault();
-    fetch('http://127.0.0.1:5000/signup', {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, phone, address, password }), // Include address in payload
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.message === 'Farmer signed up successfully!') {
-          alert('Sign Up Successful');
-          // Optionally, redirect or clear form
-        } else {
-          alert(data.error || 'An error occurred while signing up. Please try again.'); // Handle error message
-        }
-      })
-      .catch((error) => {
-        alert(error.message); // Handle fetch errors
-      });
+
+    const input = {email:email, password:password, name:name, address:address, phone:phone}
+    if (input.email !== "" && input.password !== "") {
+      auth.handleSignUp(input);
+      return;
+    }     
   };
 
   return (
-    <div className="flex flex-col justify-center items-center ms-72">
-      <h2 className="text-primary_1 text-3xl font-bold p-5">Sign Up</h2>
-      <form onSubmit={handleSubmit} className="p-3 w-96">
-        <label className="my-5">
-          <span className="block text-secondary_2 font-semibold mb-1">
+    <div className="flex flex-col justify-center items-center ms-60">
+      <div className='flex items-center justify-center'>
+      <img
+          src={logo}
+          alt="barn-monitor-logo"
+          className="w-1/3 h-1/3 max-w-xs max-h-xs"
+        /> 
+      </div>
+      <h2 className="text-primary_1 text-3xl font-bold mt-3">Sign Up</h2>
+      <form onSubmit={handleSubmit} className="w-96">
+        <label className="flex items-center my-5">
+          <span className="block text-secondary_2 font-semibold m-3">
             Name
           </span>
           <input
@@ -60,8 +45,8 @@ const Signup = () => {
             onChange={(e) => setName(e.target.value)}
           />
         </label>
-        <label className="my-5">
-          <span className="block text-secondary_2 font-semibold mb-1">
+        <label className="flex items-center my-5">
+          <span className="block text-secondary_2 font-semibold m-3">
             Email
           </span>
           <input
@@ -72,8 +57,8 @@ const Signup = () => {
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        <label className="my-5">
-          <span className="block text-secondary_2 font-semibold mb-1">
+        <label className="flex items-center my-5">
+          <span className="block text-secondary_2 font-semibold m-3">
             Phone
           </span>
           <input
@@ -84,8 +69,8 @@ const Signup = () => {
             onChange={(e) => setPhone(e.target.value)}
           />
         </label>
-        <label className="my-5">
-          <span className="block text-secondary_2 font-semibold mb-1">
+        <label className="flex items-center my-5">
+          <span className="block text-secondary_2 font-semibold m-3">
             Address
           </span>
           <input
@@ -96,8 +81,8 @@ const Signup = () => {
             onChange={(e) => setAddress(e.target.value)}
           />
         </label>
-        <label className="my-5">
-          <span className="block text-secondary_2 font-semibold mb-1">
+        <label className="flex items-center my-5">
+          <span className="block text-secondary_2 font-semibold m-3">
             Password
           </span>
           <input
@@ -110,13 +95,13 @@ const Signup = () => {
         </label>
         <button
           type="submit"
-          className="mt-5 p-3 font-bold w-full text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500"
+          className="p-3 font-bold w-full text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500"
         >
           Sign Up
         </button>
       </form>
       <p className='text-secondary_2'>
-        Already have an account?<a href="/login" className='text-secondary_1 underline font-normal'>Login</a>
+        Already have an account?<a href="/login" className='text-secondary_1 underline font-normal visited:text-purple-600'>Login</a>
       </p>
     </div>
   );

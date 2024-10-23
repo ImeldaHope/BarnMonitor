@@ -165,9 +165,7 @@ def seed():
                 db.session.add_all(feed_records)
 
         # Commit the transaction
-        db.session.commit()
-
-        print("Database seeded successfully.")
+        db.session.commit()       
 
 if __name__ == '__main__':
     # Seed the data

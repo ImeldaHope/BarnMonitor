@@ -16,7 +16,7 @@ const SplashScreen = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center ms-80 ">
+      <div className="flex justify-center items-center ms-60 ">
         <img
           src={logo}
           alt="barn-monitor-logo"

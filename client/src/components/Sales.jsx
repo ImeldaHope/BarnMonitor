@@ -25,10 +25,8 @@ const Sales = () => {
         setSalesRecords(filteredSales);
       });
   }, [salesRecords]);
-  useEffect(() => {
-    console.log('I am a sale record', salesRecords); // Log after state update
-  }, [salesRecords]);
-console.log(salesRecords)
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +40,7 @@ console.log(salesRecords)
       sale_date: formattedSaleDate,
     };
 
-    console.log('Submitting record:', record); // Debugging line
+    
 
     try {
       const response = await fetch(currentRecordId ? `http://127.0.0.1:5000/sales/${currentRecordId}` : 'http://127.0.0.1:5000/sales', {
@@ -59,11 +57,11 @@ console.log(salesRecords)
       }
 
       const data = await response.json();
-      console.log('Response data:', data); // Debugging line
+     
 
       setSuccessMessage(currentRecordId ? 'Sales record updated successfully!' : 'Sales record added successfully!');
       setErrorMessage('');
-      fetchSalesRecords(); // Re-fetch the sales records after submission
+      
       resetForm();
     } catch (error) {
       console.error('Error adding/updating sales record:', error);
@@ -97,7 +95,7 @@ console.log(salesRecords)
     setAmount(record.amount);
     setSaleDate(record.sale_date);
     setCurrentRecordId(record.id);
-    console.log('Editing record:', record); // Debugging line
+    
   };
 
   const resetForm = () => {

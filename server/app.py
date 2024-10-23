@@ -10,24 +10,6 @@ from config import db, app, api
 import logging
 
 
-# class Login(Resource):
-#     def post(self):
-#         user = Farmer.query.filter(
-#             Farmer.email == request.get_json()['email'], 
-#             Farmer.password == request.get_json()['password']
-#         ).first()
-
-#         if user:
-#             session['user_id'] = user.id
-#             print("Cookies received:", request.cookies)
-#             print(f"Session created for user ID: {session['user_id']}")
-            
-#             return make_response(jsonify({'data': {'user': user.to_dict()},'token': session.sid }), 200)
-#         else:
-#             return jsonify({'message': 'Invalid email or password'}), 401        
-
-# api.add_resource(Login, '/login', endpoint='login')
-
 class LoginResource(Resource):
     def post(self):
         try:
@@ -49,9 +31,7 @@ class LoginResource(Resource):
                 return {'error': 'Invalid email or password'}, 401  # Unauthorized
             
             if farmer:
-                session['user_id'] = farmer.id
-                print("Cookies received:", request.cookies)
-                print(f"Session created for user ID: {session['user_id']}")
+                session['user_id'] = farmer.id               
             
                 return make_response(jsonify({'data': {'user': farmer.to_dict()},'token': session.sid }), 200)
             else:
@@ -93,10 +73,11 @@ class SignupResource(Resource):
             db.session.add(new_farmer)
             db.session.commit()
 
-            return {
+            return make_response(jsonify({
                 'message': 'Farmer signed up successfully!',
-                'farmer': new_farmer.to_dict()  # Call the to_dict method for response
-            }, 201  # Created
+                'farmer': new_farmer.to_dict(),  
+                'token': session.sid  
+            }), 201)
 
         except KeyError as e:
             # Handle missing fields
@@ -109,9 +90,8 @@ api.add_resource(SignupResource, '/signup')
 
 class CheckSession(Resource):
     def get(self):
-        user_id = session.get('user_id')
-        print("Cookies received:", request.cookies)
-        print(f"I am the user in check_session: {user_id}")
+        user_id = session.get('user_id')        
+        
         if user_id:
             user = Farmer.query.get(user_id)
                     
@@ -124,7 +104,7 @@ api.add_resource(CheckSession, '/check_session')
 
 class Logout(Resource):
     def delete(self):
-        # print(f"Session deleted for user ID: {session['user_id']}")
+        
         session['user_id'] = None
         return {'message': 'Logged out successfully'}, 200
 
@@ -228,17 +208,13 @@ class FarmerResource(Resource):
                 farmer_data = farmer.to_dict()
                 farmer_data['animals'] = [animal.to_dict() for animal in farmer.animals]  # Assuming animals is a relationship
                 return farmer_data, 200  # Return dict directly with 200 status
-            return {'message': 'Farmer not found'}, 404  # Return a simple dict
-                farmer_data = farmer.to_dict()
-                farmer_data['animals'] = [animal.to_dict() for animal in farmer.animals]  # Assuming animals is a relationship
-                return farmer_data, 200  # Return dict directly with 200 status
-            return {'message': 'Farmer not found'}, 404  # Return a simple dict
+            return {'message': 'Farmer not found'}, 404  # Return a simple dict                
         else:
             # Fetch all farmers
             # Fetch all farmers
             farmers = Farmer.query.all()
             return [f.to_dict() for f in farmers], 200  # Return list of dicts directly
-            return [f.to_dict() for f in farmers], 200  # Return list of dicts directly
+             
 
     def delete(self, id):
         farmer = Farmer.query.get(id)
@@ -280,23 +256,19 @@ class FeedResource(Resource):
         # Convert date string to a Python date object
         from datetime import datetime
         date_obj = datetime.strptime(data['date'], '%Y-%m-%d').date()
-        print(type(date_obj))
+        
         new_feed = Feed(
             animal_id=data['animal_id'],
-            date=date_obj,
-            date=date_obj,
+            date=date_obj,            
             quantity=data['quantity'],
-            feed_type=data['feed_type']
-            feed_type=data['feed_type']
+            feed_type=data['feed_type']            
         )
         db.session.add(new_feed)
         db.session.commit()
 
         return make_response(jsonify(new_feed.to_dict()), 201)
     
-    # DELETE request handler
-
-        return make_response(jsonify(new_feed.to_dict()), 201)
+   
     
     # DELETE request handler
     def delete(self, id):
