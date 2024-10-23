@@ -7,6 +7,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')) || null);
   const [token, setToken] = useState(localStorage.getItem("site") || "");
   const navigate = useNavigate();
+
   const handleLogin = async (data) => {
     try {
       const response = await fetch("http://127.0.0.1:5000/login", {
@@ -32,6 +33,34 @@ const AuthProvider = ({ children }) => {
       console.error(err);
     }
   };
+
+  const handleSignUp = async (data) => {
+    try {
+      const { name, email, phone, address, password } = data;
+      
+      const response = await fetch('http://127.0.0.1:5000/signup', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, phone, address, password })});
+      const res = await response.json();
+      console.log('Signup Response:', res);
+      if (res.farmer) {
+        setUser(res.farmer);
+        setToken(res.token);
+        localStorage.setItem("site", res.token);
+        localStorage.setItem("user", JSON.stringify(res.farmer));
+        console.log("Navigating to dashboard");
+        navigate("/dashboard");
+        return;
+      }
+      throw new Error(res.message);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
 
   useEffect(() => {
     const fetchSession = async () => {    
@@ -69,7 +98,7 @@ const AuthProvider = ({ children }) => {
     navigate("/");
   };
 
-  return <AuthContext.Provider value={{ token, user, handleLogin, handleLogout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ token, user, handleLogin, handleLogout, handleSignUp }}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

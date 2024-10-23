@@ -134,12 +134,12 @@ function Dashboard() {
         <h1 className="font-extrabold text-primary_2 text-3xl pt-5">
           Dashboard
         </h1>
-        <p>
+        <p className="text-slate-500">
           Good morning,{" "}
           <span className="font-semibold italic text-secondary_1">{farmer.name}</span>
         </p>
-        <p>Checkout today's insights</p>
-        <div className="flex flex-wrap justify-start py-5 px-5">
+        <p className="text-slate-500">Checkout today's insights</p>
+        <div className="flex py-5 px-5">
           <div className="border p-5 border-gray-300 rounded-lg text-center bg-gray-50 shadow-2xl max-w-xs mx-auto">
             <h2 className="text-xl text-primary_3 font-bold mb-2">Nairobi</h2>
             <p className="text-sm text-gray-400 mb-4">
@@ -285,7 +285,7 @@ function Dashboard() {
                 className="rounded-3xl ml-5 w-full"
                 src="https://img.freepik.com/premium-photo/three-bottles-milk-tree-stump-rural-setting_538547-4936.jpg?ga=GA1.1.15938311.1690954381&semt=ais_hybrid"
               />
-              <div className="absolute border left-1/2 top-3/4 transform -translate-x-1/2 -translate-y-1/4 py-3 w-60 border-gray-300 rounded-lg text-center bg-gray-50 shadow-2xl max-w-xs mx-auto">
+              <div className="absolute border left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 py-3 w-60 border-gray-300 rounded-lg text-center bg-gray-50 shadow-2xl max-w-xs mx-auto">
                 <p className="">Production</p>
                 <p className="text-secondary_1 font-semibold text-xl">
                   {totalProduce} litres
@@ -299,59 +299,63 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="w-1/2">
-          <h1 className="text-secondary_1 text-xl font-semibold">
-            Sales Overview
-          </h1>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart
-              data={farmerSales}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="saleDate">
-                <Label value="Sales Date" offset={-5} position="insideBottom" />
-              </XAxis>
-              <YAxis>
-                <Label value="Sales Amount" angle={-90} position="insideLeft" />
-              </YAxis>
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="amount"
-                stroke="#3051A5"
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="w-1/2">
-          <h1 className="text-secondary_1 text-xl font-semibold">
-            Production Overview
-          </h1>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={farmerProduce}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="produceDate">
-                <Label
-                  value="Production Date"
-                  offset={-5}
-                  position="insideBottom"
-                />
-              </XAxis>
-              <YAxis>
-                <Label value="Quantity" angle={-90} position="insideLeft" />
-              </YAxis>
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="quantity" fill="#3051A5" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <div className="flex justify-between">
+  <div className="w-1/2 p-2">
+    <h1 className="text-secondary_1 text-xl font-semibold">
+      Sales Overview
+    </h1>
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart
+        data={farmerSales}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="saleDate">
+          <Label value="Sales Date" offset={-5} position="insideBottom" />
+        </XAxis>
+        <YAxis>
+          <Label value="Sales Amount" angle={-90} position="insideLeft" />
+        </YAxis>
+        <Tooltip />
+        <Legend />
+        <Line
+          type="monotone"
+          dataKey="amount"
+          stroke="#3051A5"
+          activeDot={{ r: 8 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+
+  <div className="w-1/2 p-2">
+    <h1 className="text-secondary_1 text-xl font-semibold">
+      Production Overview
+    </h1>
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart
+        data={farmerProduce}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="produceDate">
+          <Label
+            value="Production Date"
+            offset={-5}
+            position="insideBottom"
+          />
+        </XAxis>
+        <YAxis>
+          <Label value="Quantity" angle={-90} position="insideLeft" />
+        </YAxis>
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="quantity" fill="#3051A5" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
       </div>
     </>
   );

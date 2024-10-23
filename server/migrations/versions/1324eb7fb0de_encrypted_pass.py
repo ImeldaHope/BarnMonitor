@@ -1,8 +1,8 @@
-"""updates migration
+"""encrypted pass
 
-Revision ID: 5641828c51c8
+Revision ID: 1324eb7fb0de
 Revises: 
-Create Date: 2024-10-19 16:01:51.341603
+Create Date: 2024-10-22 08:33:45.654697
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5641828c51c8'
+revision = '1324eb7fb0de'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -62,7 +62,7 @@ def upgrade():
     op.create_table('health_records',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('animal_id', sa.Integer(), nullable=False),
-    sa.Column('checkup_date', sa.DateTime(), nullable=True),
+    sa.Column('checkup_date', sa.DateTime(), nullable=False),
     sa.Column('treatment', sa.String(), nullable=False),
     sa.Column('notes', sa.String(), nullable=True),
     sa.Column('vet_name', sa.String(), nullable=False),

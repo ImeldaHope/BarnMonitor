@@ -17,7 +17,7 @@ function Animals() {
   
   const { user } = useAuth(); // Access the authenticated user
   const farmerId = user?.id;
-  console.log(farmerId,'in animals jsx')
+  
   useEffect(() => {
     fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
       .then((response) => response.json())

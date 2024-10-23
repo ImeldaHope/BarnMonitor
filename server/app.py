@@ -10,29 +10,88 @@ from config import db, app, api
 import logging
 
 
-class Login(Resource):
+class LoginResource(Resource):
     def post(self):
-        user = Farmer.query.filter(
-            Farmer.email == request.get_json()['email'], 
-            Farmer.password == request.get_json()['password']
-        ).first()
+        try:
+            data = request.get_json()
 
-        if user:
-            session['user_id'] = user.id
-            print("Cookies received:", request.cookies)
-            print(f"Session created for user ID: {session['user_id']}")
+            # Validate required fields
+            required_fields = ['email', 'password']
+            for field in required_fields:
+                if field not in data:
+                    return {'error': f'Missing field: {field}'}, 400  # Return error for missing fields
+
+            # Check if the farmer exists
+            farmer = Farmer.query.filter_by(email=data['email']).first()
+            if not farmer:
+                return {'error': 'Invalid email or password'}, 401  # Unauthorized
+
+            # Check password
+            if not check_password_hash(farmer.password, data['password']):
+                return {'error': 'Invalid email or password'}, 401  # Unauthorized
             
-            return make_response(jsonify({'data': {'user': user.to_dict()},'token': session.sid }), 200)
-        else:
-            return jsonify({'message': 'Invalid email or password'}), 401        
+            if farmer:
+                session['user_id'] = farmer.id               
+            
+                return make_response(jsonify({'data': {'user': farmer.to_dict()},'token': session.sid }), 200)
+            else:
+                return jsonify({'message': 'Invalid email or password'}), 401  
+                  
+                      
 
-api.add_resource(Login, '/login', endpoint='login')
+        except Exception as e:
+            # Handle any other exceptions
+            return {'error': 'Failed to log in', 'details': str(e)}, 500
+api.add_resource(LoginResource, '/login')
+
+class SignupResource(Resource):
+    def post(self):
+        try:
+            data = request.get_json()
+
+            # Validate required fields
+            required_fields = ['name', 'email', 'phone', 'password', 'address']  
+            for field in required_fields:
+                if field not in data:
+                    return {'error': f'Missing field: {field}'}, 400  # Return error for missing fields
+
+            # Check if the farmer already exists
+            existing_farmer = Farmer.query.filter_by(email=data['email']).first()
+            if existing_farmer:
+                return {'error': 'Farmer with this email already exists.'}, 409  # Conflict
+
+            # Create a new farmer instance
+            new_farmer = Farmer(
+                name=data['name'],
+                email=data['email'],
+                phone=data['phone'],
+                address=data['address'],
+                password=generate_password_hash(data['password'])  # Hash the password
+            )
+
+            # Add to the database
+            db.session.add(new_farmer)
+            db.session.commit()
+
+            return make_response(jsonify({
+                'message': 'Farmer signed up successfully!',
+                'farmer': new_farmer.to_dict(),  
+                'token': session.sid  
+            }), 201)
+
+        except KeyError as e:
+            # Handle missing fields
+            return {'error': f'Missing field: {str(e)}'}, 400
+        except Exception as e:
+            # Handle any other exceptions and roll back
+            db.session.rollback()
+            return {'error': 'Failed to sign up farmer', 'details': str(e)}, 500
+api.add_resource(SignupResource, '/signup')
 
 class CheckSession(Resource):
     def get(self):
-        user_id = session.get('user_id')
-        print("Cookies received:", request.cookies)
-        print(f"I am the user in check_session: {user_id}")
+        user_id = session.get('user_id')        
+        
         if user_id:
             user = Farmer.query.get(user_id)
                     
@@ -45,7 +104,7 @@ api.add_resource(CheckSession, '/check_session')
 
 class Logout(Resource):
     def delete(self):
-        # print(f"Session deleted for user ID: {session['user_id']}")
+        
         session['user_id'] = None
         return {'message': 'Logged out successfully'}, 200
 
@@ -138,99 +197,24 @@ class AnimalById(Resource):
 
 api.add_resource(AnimalById, '/animals/<int:id>')
 
-class LoginResource(Resource):
-    def post(self):
-        try:
-            data = request.get_json()
-
-            # Validate required fields
-            required_fields = ['email', 'password']
-            for field in required_fields:
-                if field not in data:
-                    return {'error': f'Missing field: {field}'}, 400  # Return error for missing fields
-
-            # Check if the farmer exists
-            farmer = Farmer.query.filter_by(email=data['email']).first()
-            if not farmer:
-                return {'error': 'Invalid email or password'}, 401  # Unauthorized
-
-            # Check password
-            if not check_password_hash(farmer.password, data['password']):
-                return {'error': 'Invalid email or password'}, 401  # Unauthorized
-
-            # Return success message with farmer details (excluding password)
-            return {
-                'message': 'Login successful!',
-                'farmer': {
-                    'id': farmer.id,
-                    'name': farmer.name,
-                    'email': farmer.email,
-                    'phone': farmer.phone,
-                    'address': farmer.address,
-                }
-            }, 200  # OK
-
-        except Exception as e:
-            # Handle any other exceptions
-            return {'error': 'Failed to log in', 'details': str(e)}, 500
-api.add_resource(LoginResource, '/login')
-
-class SignupResource(Resource):
-    def post(self):
-        try:
-            data = request.get_json()
-
-            # Validate required fields
-            required_fields = ['name', 'email', 'phone', 'password', 'address']  
-            for field in required_fields:
-                if field not in data:
-                    return {'error': f'Missing field: {field}'}, 400  # Return error for missing fields
-
-            # Check if the farmer already exists
-            existing_farmer = Farmer.query.filter_by(email=data['email']).first()
-            if existing_farmer:
-                return {'error': 'Farmer with this email already exists.'}, 409  # Conflict
-
-            # Create a new farmer instance
-            new_farmer = Farmer(
-                name=data['name'],
-                email=data['email'],
-                phone=data['phone'],
-                address=data['address'],
-                password=generate_password_hash(data['password'])  # Hash the password
-            )
-
-            # Add to the database
-            db.session.add(new_farmer)
-            db.session.commit()
-
-            return {
-                'message': 'Farmer signed up successfully!',
-                'farmer': new_farmer.to_dict()  # Call the to_dict method for response
-            }, 201  # Created
-
-        except KeyError as e:
-            # Handle missing fields
-            return {'error': f'Missing field: {str(e)}'}, 400
-        except Exception as e:
-            # Handle any other exceptions and roll back
-            db.session.rollback()
-            return {'error': 'Failed to sign up farmer', 'details': str(e)}, 500
-
 class FarmerResource(Resource):
     def get(self, id=None):
         if id:
+            # Fetch a specific farmer by ID
+            farmer = Farmer.query.get(id)
             # Fetch a specific farmer by ID
             farmer = Farmer.query.get(id)
             if farmer:
                 farmer_data = farmer.to_dict()
                 farmer_data['animals'] = [animal.to_dict() for animal in farmer.animals]  # Assuming animals is a relationship
                 return farmer_data, 200  # Return dict directly with 200 status
-            return {'message': 'Farmer not found'}, 404  # Return a simple dict
+            return {'message': 'Farmer not found'}, 404  # Return a simple dict                
         else:
+            # Fetch all farmers
             # Fetch all farmers
             farmers = Farmer.query.all()
             return [f.to_dict() for f in farmers], 200  # Return list of dicts directly
+             
 
     def delete(self, id):
         farmer = Farmer.query.get(id)
@@ -245,10 +229,12 @@ class FarmerResource(Resource):
 
 
 # Register the resources with the API
-api.add_resource(SignupResource, '/signup')
+
 api.add_resource(FarmerResource, '/farmers', '/farmers/<int:id>')
 
 class FeedResource(Resource):
+    
+    # GET request handler
     
     # GET request handler
     def get(self, id=None):
@@ -262,23 +248,27 @@ class FeedResource(Resource):
             return jsonify([f.to_dict() for f in feeds])
     
     # POST request handler
+    
+    # POST request handler
     def post(self):
         data = request.get_json()
 
         # Convert date string to a Python date object
         from datetime import datetime
         date_obj = datetime.strptime(data['date'], '%Y-%m-%d').date()
-
+        
         new_feed = Feed(
             animal_id=data['animal_id'],
-            date=date_obj,
+            date=date_obj,            
             quantity=data['quantity'],
-            feed_type=data['feed_type']
+            feed_type=data['feed_type']            
         )
         db.session.add(new_feed)
         db.session.commit()
 
         return make_response(jsonify(new_feed.to_dict()), 201)
+    
+   
     
     # DELETE request handler
     def delete(self, id):
@@ -289,6 +279,8 @@ class FeedResource(Resource):
             return jsonify({'message': 'Feed deleted successfully'})
         return jsonify({'message': 'Feed not found'}), 404
 
+
+# Register the FeedResource with multiple routes
 
 # Register the FeedResource with multiple routes
 api.add_resource(FeedResource, '/feeds', '/feeds/<int:id>')
@@ -449,7 +441,7 @@ class ProductionResource(Resource):
         )
         db.session.add(new_production)
         db.session.commit()
-        return jsonify(new_production.to_dict()), 201, 201
+        return make_response(jsonify(new_production.to_dict()), 201)
 
     def patch(self, id):
         production = Production.query.get(id)
@@ -467,7 +459,7 @@ class ProductionResource(Resource):
             production.production_date = data['production_date']
 
         db.session.commit()
-        return jsonify({'message': 'Production record updated successfully'}), 200
+        return make_response(jsonify(data), 201)
 
     def delete(self, id):
         production = Production.query.get(id)
@@ -500,7 +492,7 @@ class SaleResource(Resource):
         )
         db.session.add(new_sale)
         db.session.commit()
-        return jsonify({'message': 'Sale record added successfully'}), 201
+        return make_response(jsonify(new_sale.to_dict()), 201)
 
     def patch(self, id):
         sale = Sale.query.get(id)
@@ -520,7 +512,7 @@ class SaleResource(Resource):
             sale.amount = data['amount']
 
         db.session.commit()
-        return jsonify({'message': 'Sale record updated successfully'}), 200
+        return make_response(jsonify(sale.to_dict()), 201)
 
     def delete(self, id):
         sale = Sale.query.get(id)

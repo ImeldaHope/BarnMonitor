@@ -23,7 +23,6 @@ function AnimalDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(animal.name);
 
-  console.log("Value at newname is ", newName);
   const { animalId } = useParams();
   const navigate = useNavigate();
 
