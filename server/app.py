@@ -354,12 +354,12 @@ class HealthRecordResource(Resource):
     def post(self):
         try:
             data = request.get_json()
-
+            animal = Animal.query.filter_by(name=data['name']).first()
             # Convert checkup_date from string to datetime object
             checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
 
             new_record = HealthRecord(
-                animal_id=data['animal_id'],
+                animal_id=animal.id,
                 checkup_date=checkup_date,
                 treatment=data['treatment'],
                 notes=data.get('notes', ''),  # Optional field
@@ -384,8 +384,10 @@ class HealthRecordResource(Resource):
             return make_response(jsonify({"message": "Health Record not found"}), 404)
 
         data = request.get_json()
-        if 'animal_id' in data:
-            health_record.animal_id = data['animal_id']
+        animal = Animal.query.filter_by(name=data['name']).first()
+        if 'name' in data:
+            
+            health_record.animal_id = animal.id
         if 'checkup_date' in data:
             try:
                 health_record.checkup_date = datetime.strptime(data['checkup_date'], '%Y-%m-%d')
