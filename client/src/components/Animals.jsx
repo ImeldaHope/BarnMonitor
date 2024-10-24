@@ -29,7 +29,7 @@ function Animals() {
         setLoading(false);
       });
   }, []);
-  
+  console.log(animals)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewAnimal({

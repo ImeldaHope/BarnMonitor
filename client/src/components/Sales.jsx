@@ -165,7 +165,8 @@ const Sales = () => {
   required
   className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white">
   <option value="" disabled>Select an animal</option>
-  {animals.map(animal => (
+  {animals.filter(animal => animal.farmer_id === farmerId) // Filter animals by farmerId
+    .map(animal => (
     <option key={animal.id} value={animal.id}>{animal.name}</option>
   ))}
 </select>
