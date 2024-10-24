@@ -4,29 +4,35 @@ import { faPlus, faEdit, faTrash, faSort } from '@fortawesome/free-solid-svg-ico
 import { useAuth } from "../AuthContext";
 
 const AddHealthRecord = () => {
-  const [animalId, setAnimalId] = useState('');
+  const [animalName, setAnimalName] = useState('');
   const [checkupDate, setCheckupDate] = useState('');
   const [treatment, setTreatment] = useState('');
   const [vetName, setVetName] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [healthRecords, setHealthRecords] = useState([]);
+  // const [healthRecords, setHealthRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [editMode, setEditMode] = useState(false);
   const [editRecordId, setEditRecordId] = useState(null);
+  const [animals, setAnimals] = useState([]);
 
   const { user } = useAuth();
   const farmerId = user?.id;
 
   const fetchHealthRecords = () => {
     fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const record_data = data.animals.flatMap((animal) => animal.health_records);
-        setHealthRecords(record_data);
-      })
-      .catch((error) => console.error('Error fetching health records:', error));
+    .then((response) => response.json())
+    .then((data) => {
+      const animalsData = data.animals.map((animal) => ({
+        animalName: animal.name,
+        healthRecords: animal.health_records
+      }));
+
+      // Set the entire array of animals at once
+      setAnimals(animalsData);
+    });
+      
   };
 
   useEffect(() => {
@@ -35,17 +41,31 @@ const AddHealthRecord = () => {
     }
   }, [farmerId]);
 
+  // useEffect(() => {
+  //   fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       const animalsData = data.animals.map((animal) => ({
+  //         animalName: animal.name,
+  //         healthRecords: animal.health_records
+  //       }));
+  
+  //       // Set the entire array of animals at once
+  //       setAnimals(animalsData);
+  //     });
+  // }, [farmerId]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
     const record = {
-      animal_id: animalId,
+      name: animalName,
       checkup_date: checkupDate,
       treatment,
       vet_name: vetName,
       farmer_id: farmerId,
     };
-
+    
     const requestMethod = editMode ? 'PATCH' : 'POST';
     const url = editMode
       ? `http://127.0.0.1:5000/health_records/${editRecordId}`
@@ -68,7 +88,7 @@ const AddHealthRecord = () => {
         setErrorMessage(editMode ? 'Failed to update health record.' : 'Failed to add health record.');
       });
 
-    setAnimalId('');
+    setAnimalName('');
     setCheckupDate('');
     setTreatment('');
     setVetName('');
@@ -79,9 +99,10 @@ const AddHealthRecord = () => {
       .then(() => setHealthRecords(healthRecords.filter((record) => record.id !== id)))
       .catch((error) => console.error('Error deleting health record:', error));
   };
+  console.log(animals)
 
   const handleEdit = (record) => {
-    setAnimalId(record.animal_id);
+    setAnimalName(record.name);
     setCheckupDate(record.checkup_date);
     setTreatment(record.treatment);
     setVetName(record.vet_name);
@@ -108,13 +129,13 @@ const AddHealthRecord = () => {
       <form onSubmit={handleSubmit} className="flex flex-row justify-between items-center gap-6 p-4 bg-gray-100 shadow-lg rounded-lg w-full my-10">
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
-            <span className="block text-secondary_1 font-semibold mb-1">Animal ID</span>
+            <span className="block text-secondary_1 font-semibold mb-1">Animal Name</span>
           </label>
           <input
             type="text"
-            id="animal_id"
-            value={animalId}
-            onChange={(e) => setAnimalId(e.target.value)}
+            id="animal_name"
+            value={animalName}
+            onChange={(e) => setAnimalName(e.target.value)}
             required
             className="border text-secondary_2 border-gray-300 rounded-lg p-2 w-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary_2 transition duration-200"
           />
@@ -189,7 +210,7 @@ const AddHealthRecord = () => {
       <table className="table-auto w-full my-6">
         <thead>
           <tr className="bg-primary_1 text-white">
-            <th className="px-4 py-2">Animal ID</th>
+            <th className="px-4 py-2">Animal Name</th>
             <th className="px-4 py-2">Treatment</th>
             <th className="px-4 py-2">Vet</th>
             <th className="px-4 py-2">Checkup Date</th>
@@ -197,21 +218,23 @@ const AddHealthRecord = () => {
           </tr>
         </thead>
         <tbody>
-          {healthRecords.map((record) => (
-            <tr key={record.id} className="text-secondary_2 bg-gray-50 hover:bg-gray-100">
-              <td className="border px-4 py-2">{record.animal_id}</td>
-              <td className="border px-4 py-2">{record.treatment}</td>
-              <td className="border px-4 py-2">{record.vet_name}</td>
-              <td className="border px-4 py-2">{record.checkup_date}</td>
-              <td className="border px-4 py-2">
-                <button onClick={() => handleEdit(record)} className="text-white bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 flex items-center">
-                  <FontAwesomeIcon icon={faEdit} className="mr-2" /> Edit
-                </button>
-                <button onClick={() => handleDelete(record.id)} className="text-white bg-red-600 font-bold py-2 px-4 rounded hover:bg-red-700 transition duration-200 flex items-center">
-                  <FontAwesomeIcon icon={faTrash} className="mr-2" /> Delete
-                </button>
-              </td>
-            </tr>
+          {animals.map((record) => (            
+              record.healthRecords.map((health) => (                
+                <tr key={record.id} className="text-secondary_2 bg-gray-50 hover:bg-gray-100">
+                <td className="border px-4 py-2">{record.animalName}</td>
+                <td className="border px-4 py-2">{health.treatment}</td>
+                <td className="border px-4 py-2">{health.vet_name}</td>
+                <td className="border px-4 py-2">{health.checkup_date}</td>
+                <td className="border px-4 py-2">
+                  <button onClick={() => handleEdit(health)} className="text-white bg-secondary_1 font-bold py-2 px-4 rounded hover:bg-primary_2 transition duration-200 flex items-center">
+                    <FontAwesomeIcon icon={faEdit} className="mr-2" /> Edit
+                  </button>
+                  <button onClick={() => handleDelete(health.id)} className="text-white bg-red-600 font-bold py-2 px-4 rounded hover:bg-red-700 transition duration-200 flex items-center">
+                    <FontAwesomeIcon icon={faTrash} className="mr-2" /> Delete
+                  </button>
+                </td>
+                </tr>
+              ))
           ))}
         </tbody>
       </table>
