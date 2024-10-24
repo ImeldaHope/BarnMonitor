@@ -17,26 +17,39 @@ const Sales = () => {
   const farmerId = user?.id;
 
   useEffect(() => {
-    const fetchSalesRecords = async () => {
-      const salesResponse = await fetch('http://127.0.0.1:5000/sales');
-      const salesData = await salesResponse.json();
+    fetchSalesRecords();
+    fetchAnimals(); // Fetch animals when the component mounts
+  }, [farmerId]); // Re-run if farmerId changes
+
+  const fetchSalesRecords = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/sales');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const salesData = await response.json();
+      // Include the animals data in the sales records
       const filteredSales = salesData.filter((sale) => sale.animal.farmer_id === farmerId);
       setSalesRecords(filteredSales);
-    };
+    } catch (error) {
+      console.error('Error fetching sales records:', error);
+      setErrorMessage('Failed to fetch sales records.');
+    }
+  };
 
-    const fetchAnimals = async () => {
-      const animalsResponse = await fetch(`http://127.0.0.1:5000/animals?farmer_id=${farmerId}`);
-      const animalsData = await animalsResponse.json();
-      setAnimals(animalsData);
-    };
-
-    fetchSalesRecords();
-    fetchAnimals();
-  }, [farmerId]);
+  const fetchAnimals = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/animals'); // Ensure this endpoint returns all animals
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setAnimals(data); // Assuming data is an array of animals with id and name
+    } catch (error) {
+      console.error('Error fetching animals:', error);
+      setErrorMessage('Failed to fetch animals.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const record = {
       animal_id: animalId,
       product_type: productType,
@@ -44,41 +57,44 @@ const Sales = () => {
       amount: parseFloat(amount),
       sale_date: new Date(saleDate).toISOString().split('T')[0],
     };
-  
+
     try {
       const response = await fetch(`http://127.0.0.1:5000/sales${currentRecordId ? `/${currentRecordId}` : ''}`, {
         method: currentRecordId ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(record),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Failed to submit sales record: ${errorData.message || response.statusText}`);
       }
-  
-      // Update the salesRecords state
+
+      // Use the response to get the updated record
+      const newRecord = await response.json();
+
       if (currentRecordId) {
         // Update the existing record
         setSalesRecords(salesRecords.map((sale) =>
-          sale.id === currentRecordId ? { ...sale, ...record } : sale
+          sale.id === currentRecordId ? { ...newRecord } : sale
         ));
         setSuccessMessage('Sales record updated successfully!');
       } else {
         // Add the new record
-        const newRecord = await response.json(); // Get the new record data from the response
-        setSalesRecords([...salesRecords, { ...record, id: newRecord.id }]); // Use the ID returned from your API
+        setSalesRecords([...salesRecords, newRecord]); // Add newRecord directly
         setSuccessMessage('Sales record added successfully!');
       }
-  
+
       setErrorMessage('');
       resetForm();
+      fetchSalesRecords(); // Optionally refetch sales records to ensure freshness
     } catch (error) {
       console.error('Error adding/updating sales record:', error);
       setErrorMessage(' ' + error.message);
       setSuccessMessage('');
     }
-  };
+};
+
   
 
   const handleDelete = async (id) => {
@@ -140,20 +156,19 @@ const Sales = () => {
   
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
-              Animal
+              Animal Name
             </label>
             <select
-              id="animal_id"
-              value={animalId}
-              onChange={(e) => setAnimalId(e.target.value)}
-              required
-              className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white"
-            >
-              <option value="" disabled>Select an animal</option>
-              {animals.map(animal => (
-                <option key={animal.id} value={animal.id}>{animal.name}</option>
-              ))}
-            </select>
+  id="animal_id"
+  value={animalId}
+  onChange={(e) => setAnimalId(e.target.value)}
+  required
+  className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white">
+  <option value="" disabled>Select an animal</option>
+  {animals.map(animal => (
+    <option key={animal.id} value={animal.id}>{animal.name}</option>
+  ))}
+</select>
           </div>
 
           <div className="mb-4">
@@ -184,7 +199,7 @@ const Sales = () => {
           </div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="amount">
-              Amount (R)
+              Amount (Ksh)
             </label>
             <input
               type="number"
@@ -222,10 +237,10 @@ const Sales = () => {
         <table className="min-w-full">
           <thead>
           <tr className="bg-primary_1 text-white">
-              <th className="px-6 py-3 text-left">Animal</th>
+              <th className="px-6 py-3 text-left">Animal Name</th>
               <th className="px-6 py-3 text-left">Product Type</th>
-              <th className="px-6 py-3 text-left">Quantity Sold</th>
-              <th className="px-6 py-3 text-left">Amount</th>
+              <th className="px-6 py-3 text-left">Quantity Sold(kg/Litres)</th>
+              <th className="px-6 py-3 text-left">Amount(Ksh)</th>
               <th className="px-6 py-3 text-left">Sale Date</th>
               <th className="px-6 py-3 text-left">Actions</th>
             </tr>
@@ -235,8 +250,8 @@ const Sales = () => {
               <tr key={record.id}className="border-b">
                 <td className="px-6 py-4 text-black">{record.animal?.name}</td>
                 <td className="px-6 py-4 text-black">{record.product_type}</td>
-                <td className="px-6 py-4 text-black">{record.quantity_sold} kg/Litres</td>
-                <td className="px-6 py-4 text-black">R {record.amount.toFixed(2)}</td>
+                <td className="px-6 py-4 text-black">{record.quantity_sold} </td>
+                <td className="px-6 py-4 text-black"> {record.amount.toFixed(2)}</td>
                 <td className="px-6 py-4 text-black">{new Date(record.sale_date).toLocaleDateString()}</td>
                 <td className="px-6 py-4 text-black">
                   <button
