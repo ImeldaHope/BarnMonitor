@@ -5,81 +5,80 @@ const Sales = () => {
   const [animalId, setAnimalId] = useState('');
   const [productType, setProductType] = useState('');
   const [quantitySold, setQuantitySold] = useState('');
-  const [amount, setAmount] = useState('');
   const [saleDate, setSaleDate] = useState('');
   const [salesRecords, setSalesRecords] = useState([]);
-  const [animals, setAnimals] = useState([]); 
+  const [animals, setAnimals] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [currentRecordId, setCurrentRecordId] = useState(null);
-  
-  const { user } = useAuth(); // Access the authenticated user
+
+  const { user } = useAuth();
   const farmerId = user?.id;
 
   useEffect(() => {
-    const fetchSalesRecords = async () => {
-      const salesResponse = await fetch('http://127.0.0.1:5000/sales');
-      const salesData = await salesResponse.json();
-      const filteredSales = salesData.filter((sale) => sale.animal.farmer_id === farmerId);
-      setSalesRecords(filteredSales);
-    };
-
-    const fetchAnimals = async () => {
-      const animalsResponse = await fetch(`http://127.0.0.1:5000/animals?farmer_id=${farmerId}`);
-      const animalsData = await animalsResponse.json();
-      setAnimals(animalsData);
-    };
-
     fetchSalesRecords();
     fetchAnimals();
-  }, [farmerId]);
+  }, []);
+
+  const fetchSalesRecords = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/sales');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      const filteredSales = data.filter((sale) => sale.animal.farmer_id === farmerId);
+      setSalesRecords(filteredSales);
+    } catch (error) {
+      console.error('Error fetching sales records:', error);
+      setErrorMessage('Failed to fetch sales records.');
+    }
+  };
+
+  const fetchAnimals = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/animals');
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setAnimals(data);
+    } catch (error) {
+      console.error('Error fetching animals:', error);
+      setErrorMessage('Failed to fetch animals.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    const formattedSaleDate = new Date(saleDate).toISOString().split('T')[0];
     const record = {
       animal_id: animalId,
       product_type: productType,
       quantity_sold: parseInt(quantitySold, 10),
-      amount: parseFloat(amount),
-      sale_date: new Date(saleDate).toISOString().split('T')[0],
+      sale_date: formattedSaleDate,
     };
-  
+
     try {
-      const response = await fetch(`http://127.0.0.1:5000/sales${currentRecordId ? `/${currentRecordId}` : ''}`, {
+      const response = await fetch(currentRecordId ? `http://127.0.0.1:5000/sales/${currentRecordId}` : 'http://127.0.0.1:5000/sales', {
         method: currentRecordId ? 'PATCH' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(record),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Failed to submit sales record: ${errorData.message || response.statusText}`);
       }
-  
-      // Update the salesRecords state
-      if (currentRecordId) {
-        // Update the existing record
-        setSalesRecords(salesRecords.map((sale) =>
-          sale.id === currentRecordId ? { ...sale, ...record } : sale
-        ));
-        setSuccessMessage('Sales record updated successfully!');
-      } else {
-        // Add the new record
-        const newRecord = await response.json(); // Get the new record data from the response
-        setSalesRecords([...salesRecords, { ...record, id: newRecord.id }]); // Use the ID returned from your API
-        setSuccessMessage('Sales record added successfully!');
-      }
-  
+
+      setSuccessMessage(currentRecordId ? 'Sales record updated successfully!' : 'Sales record added successfully!');
       setErrorMessage('');
+      fetchSalesRecords();
       resetForm();
     } catch (error) {
       console.error('Error adding/updating sales record:', error);
-      setErrorMessage(' ' + error.message);
-      setSuccessMessage('');
+      setErrorMessage('Failed to add/update sales record: ' + error.message);
     }
   };
-  
 
   const handleDelete = async (id) => {
     try {
@@ -103,21 +102,23 @@ const Sales = () => {
     setAnimalId(record.animal_id);
     setProductType(record.product_type);
     setQuantitySold(record.quantity_sold);
-    setAmount(record.amount);
     setSaleDate(record.sale_date);
     setCurrentRecordId(record.id);
-  
   };
 
   const resetForm = () => {
     setAnimalId('');
     setProductType('');
     setQuantitySold('');
-    setAmount('');
     setSaleDate('');
     setCurrentRecordId(null);
     setSuccessMessage('');
     setErrorMessage('');
+  };
+
+  const getAnimalNameById = (id) => {
+    const animal = animals.find((animal) => animal.id === id);
+    return animal ? animal.name : 'Unknown Animal';
   };
 
   return (
@@ -149,9 +150,11 @@ const Sales = () => {
               required
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white"
             >
-              <option value="" disabled>Select an animal</option>
-              {animals.map(animal => (
-                <option key={animal.id} value={animal.id}>{animal.name}</option>
+              <option value="">Select an animal</option>
+              {animals.map((animal) => (
+                <option key={animal.id} value={animal.id}>
+                  {animal.name}
+                </option>
               ))}
             </select>
           </div>
@@ -183,19 +186,6 @@ const Sales = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="amount">
-              Amount (R)
-            </label>
-            <input
-              type="number"
-              id="amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white"
-            />
-          </div>
-          <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sale_date">
               Sale Date
             </label>
@@ -208,54 +198,54 @@ const Sales = () => {
               className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white"
             />
           </div>
-          <div className="flex items-center justify-between">
-            <button
-              type="submit"
-              className="bg-primary_2 text-gray-100 hover:bg-secondary_1 rounded-lg p-2 text-xl"
-            >
-              {currentRecordId ? 'Update Record' : 'Add Record'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="bg-primary_2 text-gray-100 hover:bg-secondary_1 rounded-lg p-2 text-xl"
+          >
+            {currentRecordId ? 'Update' : 'Add'} Sales Record
+          </button>
         </form>
   
-        <h3 className="font-bold text-primary_2 text-2xl">Sales Records</h3>
-        <table className="min-w-full">
-          <thead>
-          <tr className="bg-primary_1 text-white">
-              <th className="px-6 py-3 text-left">Animal</th>
-              <th className="px-6 py-3 text-left">Product Type</th>
-              <th className="px-6 py-3 text-left">Quantity Sold</th>
-              <th className="px-6 py-3 text-left">Amount</th>
-              <th className="px-6 py-3 text-left">Sale Date</th>
-              <th className="px-6 py-3 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salesRecords.map((record) => (
-              <tr key={record.id}className="border-b">
-                <td className="px-6 py-4 text-black">{record.animal?.name}</td>
-                <td className="px-6 py-4 text-black">{record.product_type}</td>
-                <td className="px-6 py-4 text-black">{record.quantity_sold} kg/Litres</td>
-                <td className="px-6 py-4 text-black">R {record.amount.toFixed(2)}</td>
-                <td className="px-6 py-4 text-black">{new Date(record.sale_date).toLocaleDateString()}</td>
-                <td className="px-6 py-4 text-black">
-                  <button
-                    onClick={() => handleEdit(record)}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(record.id)}
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                  >
-                    Delete
-                  </button>
-                </td>
+        <div className="bg-white shadow-lg rounded p-6 mb-4 w-full overflow-auto">
+          <h3 className="text-3xl font-bold mb-4" style={{ color: '#027217' }}>
+            Sales Records
+          </h3>
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-primary_1 text-white">
+                <th className="px-6 py-3 text-left">Animal</th>
+                <th className="px-6 py-3 text-left">Product Type</th>
+                <th className="px-6 py-3 text-left">Quantity Sold (kg/Litres)</th>
+                <th className="px-6 py-3 text-left">Sale Date</th>
+                <th className="px-6 py-3 text-left">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {salesRecords.map((record) => (
+                <tr key={record.id}>
+                  <td className="px-6 py-3 border">{getAnimalNameById(record.animal_id)}</td>
+                  <td className="px-6 py-3 border">{record.product_type}</td>
+                  <td className="px-6 py-3 border">{record.quantity_sold}</td>
+                  <td className="px-6 py-3 border">{record.sale_date}</td>
+                  <td className="px-6 py-3 border">
+                    <button
+                      onClick={() => handleEdit(record)}
+                      className="bg-primary_1 text-gray-100 hover:bg-secondary_1 rounded-lg p-2 text-sm mr-2"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(record.id)}
+                      className="bg-red-500 text-gray-100 hover:bg-red-700 rounded-lg p-2 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
