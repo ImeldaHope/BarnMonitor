@@ -141,7 +141,7 @@ const Production = () => {
   
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="animal_id">
-              Animal
+              Animal Name
             </label>
             <select
               id="animal_id"
@@ -213,7 +213,7 @@ const Production = () => {
           <table className="min-w-full">
             <thead>
               <tr className="bg-primary_1 text-white">
-                <th className="px-6 py-3 text-left">Animal</th> {/* Changed to 'Animal' */}
+                <th className="px-6 py-3 text-left">Animal Name</th> {/* Changed to 'Animal' */}
                 <th className="px-6 py-3 text-left">Product Type</th>
                 <th className="px-6 py-3 text-left">Quantity (kg/Litres)</th>
                 <th className="px-6 py-3 text-left">Production Date</th>
