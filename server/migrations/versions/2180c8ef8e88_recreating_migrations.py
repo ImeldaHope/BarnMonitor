@@ -1,8 +1,8 @@
-"""encrypted pass
+"""Recreating migrations
 
-Revision ID: 1324eb7fb0de
+Revision ID: 2180c8ef8e88
 Revises: 
-Create Date: 2024-10-22 08:33:45.654697
+Create Date: 2024-10-24 10:22:24.640838
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1324eb7fb0de'
+revision = '2180c8ef8e88'
 down_revision = None
 branch_labels = None
 depends_on = None
