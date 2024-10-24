@@ -144,19 +144,21 @@ const Production = () => {
               Animal Name
             </label>
             <select
-              id="animal_id"
-              value={animalId}
-              onChange={(e) => setAnimalId(e.target.value)}
-              required
-              className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white"
-            >
-              <option value="">Select an animal</option>
-              {animals.map((animal) => (
-                <option key={animal.id} value={animal.id}>
-                  {animal.name} {/* Assuming each animal object has an id and a name */}
-                </option>
-              ))}
-            </select>
+  id="animal_id"
+  value={animalId}
+  onChange={(e) => setAnimalId(e.target.value)}
+  required
+  className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-green-500 bg-white"
+>
+  <option value="" disabled>Select an animal</option>
+  {animals
+    .filter(animal => animal.farmer_id === farmerId) // Filter animals by farmerId
+    .map(animal => (
+      <option key={animal.id} value={animal.id}>
+        {animal.name}
+      </option>
+    ))}
+</select>
           </div>
 
           <div className="mb-4">
