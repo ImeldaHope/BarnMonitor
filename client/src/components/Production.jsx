@@ -22,7 +22,7 @@ const Production = () => {
 
   const fetchProductionRecords = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/productions');
+      const response = await fetch('https://barnmonitor.onrender.com/productions');
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       const filteredProduction = data.filter((produce) => produce.animal.farmer_id === farmerId);
@@ -35,7 +35,7 @@ const Production = () => {
 
   const fetchAnimals = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/animals'); // Update this endpoint accordingly
+      const response = await fetch('https://barnmonitor.onrender.com/animals'); // Update this endpoint accordingly
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
       setAnimals(data); // Assuming data is an array of animals with id and name
@@ -57,7 +57,7 @@ const Production = () => {
     };
 
     try {
-      const response = await fetch(currentRecordId ? `http://127.0.0.1:5000/productions/${currentRecordId}` : 'http://127.0.0.1:5000/productions', {
+      const response = await fetch(currentRecordId ? `https://barnmonitor.onrender.com/productions/${currentRecordId}` : 'https://barnmonitor.onrender.com/productions', {
         method: currentRecordId ? 'PATCH' : 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const Production = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/productions/${id}`, {
+      const response = await fetch(`https://barnmonitor.onrender.com/productions/${id}`, {
         method: 'DELETE',
       });
 

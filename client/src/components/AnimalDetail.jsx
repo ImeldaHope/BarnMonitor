@@ -31,14 +31,14 @@ function AnimalDetail() {
   }, [animal.name]);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/animals/${animalId}`)
+    fetch(`https://barnmonitor.onrender.com/animals/${animalId}`)
       .then((response) => response.json())
       .then((data) => setAnimal(data))
       .catch((error) => console.error("Error fetching animals:", error));
   }, [animalId]);
 
   function handleDeleteAnimal(animalId) {
-    fetch(`http://127.0.0.1:5000/animals/${animalId}`, {
+    fetch(`https://barnmonitor.onrender.com/animals/${animalId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -52,7 +52,7 @@ function AnimalDetail() {
 
   function handleUpdateAnimalName(animalId, newName) {
     if (isEditing) {
-      fetch(`http://127.0.0.1:5000/animals/${animalId}`, {
+      fetch(`https://barnmonitor.onrender.com/animals/${animalId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

@@ -20,7 +20,7 @@ const Feed = () => {
     }, [farmerId]);
 
     const fetchFeedRecords = () => {
-        fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
+        fetch(`https://barnmonitor.onrender.com/farmers/${farmerId}`)
             .then((response) => response.json())
             .then((data) => {
                 const animalsWithFeedRecords = data.animals.filter(
@@ -44,7 +44,7 @@ const Feed = () => {
 
     const fetchAnimals = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/animals');
+            const response = await fetch('https://barnmonitor.onrender.com/animals');
             if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
             setAnimals(data);
@@ -66,7 +66,7 @@ const Feed = () => {
         };
 
         try {
-            const response = await fetch('http://127.0.0.1:5000/feeds', {
+            const response = await fetch('https://barnmonitor.onrender.com/feeds', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ const Feed = () => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://127.0.0.1:5000/feeds/${id}`, {
+            const response = await fetch(`https://barnmonitor.onrender.com/feeds/${id}`, {
                 method: 'DELETE',
             });
 

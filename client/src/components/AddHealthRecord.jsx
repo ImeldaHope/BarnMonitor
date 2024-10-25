@@ -21,7 +21,7 @@ const AddHealthRecord = () => {
   const farmerId = user?.id;
 
   const fetchHealthRecords = () => {
-    fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
+    fetch(`https://barnmonitor.onrender.com/farmers/${farmerId}`)
     .then((response) => response.json())
     .then((data) => {
       const animalsData = data.animals.map((animal) => ({
@@ -42,7 +42,7 @@ const AddHealthRecord = () => {
   }, [farmerId]);
 
   // useEffect(() => {
-  //   fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
+  //   fetch(`https://barnmonitor.onrender.com/farmers/${farmerId}`)
   //     .then((response) => response.json())
   //     .then((data) => {
   //       const animalsData = data.animals.map((animal) => ({
@@ -68,8 +68,8 @@ const AddHealthRecord = () => {
     
     const requestMethod = editMode ? 'PATCH' : 'POST';
     const url = editMode
-      ? `http://127.0.0.1:5000/health_records/${editRecordId}`
-      : 'http://127.0.0.1:5000/health_records';
+      ? `https://barnmonitor.onrender.com/health_records/${editRecordId}`
+      : 'https://barnmonitor.onrender.com/health_records';
 
     fetch(url, {
       method: requestMethod,
@@ -95,7 +95,7 @@ const AddHealthRecord = () => {
   };
 
   const handleDelete = (id) => {
-    fetch(`http://127.0.0.1:5000/health_records/${id}`, { method: 'DELETE' })
+    fetch(`https://barnmonitor.onrender.com/health_records/${id}`, { method: 'DELETE' })
       .then(() => setHealthRecords(healthRecords.filter((record) => record.id !== id)))
       .catch((error) => console.error('Error deleting health record:', error));
   };
