@@ -61,7 +61,7 @@ __pycache__
 
 # database
 *.db
-instance
+
 .vscode
 package-lock.json
 
