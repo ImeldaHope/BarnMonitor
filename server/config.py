@@ -38,7 +38,7 @@ app.config['SESSION_FILE_THRESHOLD'] = 100
 app.config['SESSION_COOKIE_NAME'] = 'barnmonitor_session'
 Session(app)
 
-CORS(app, supports_credentials=True, secure=True, resources={r"/*": {"origins": "https://barnmonitor.vercel.app"}})
+CORS(app, supports_credentials=True, secure=True, methods=["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],resources={r"/*": {"origins": "https://barnmonitor.vercel.app"}})
 
 migrate=Migrate(app, db)
 db.init_app(app)
