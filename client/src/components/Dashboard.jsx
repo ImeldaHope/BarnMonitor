@@ -52,7 +52,7 @@ function Dashboard() {
 
   //Fetching sales data for logged in farmer
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/sales`)
+    fetch(`https://barnmonitor.onrender.com/sales`)
       .then((response) => response.json())
       .then((data) => {        
         const filteredSales = data
@@ -73,7 +73,7 @@ function Dashboard() {
 
   //Fetching produce for logged in farmer
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/productions`)
+    fetch(`https://barnmonitor.onrender.com/productions`)
       .then((response) => response.json())
       .then((data) => {        
         const filteredProduces = data
@@ -94,7 +94,7 @@ function Dashboard() {
 
   //Fetching farmer
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
+    fetch(`https://barnmonitor.onrender.com/farmers/${farmerId}`)
       .then((response) => response.json())
       .then((data) => {
         const animals = data.animals.length;

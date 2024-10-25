@@ -19,7 +19,7 @@ function Animals() {
   const farmerId = user?.id;
   
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/farmers/${farmerId}`)
+    fetch(`https://barnmonitor.onrender.com/farmers/${farmerId}`)
       .then((response) => response.json())
       .then((data) => setAnimals(data.animals))
       .catch((err) => {
@@ -52,7 +52,7 @@ function Animals() {
       animal_type_id: 1
     };
 
-    fetch("http://127.0.0.1:5000/animals", {
+    fetch("https://barnmonitor.onrender.com/animals", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

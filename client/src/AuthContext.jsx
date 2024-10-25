@@ -10,7 +10,7 @@ const AuthProvider = ({ children }) => {
 
   const handleLogin = async (data) => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/login", {
+      const response = await fetch("https://barnmonitor.onrender.com/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +38,7 @@ const AuthProvider = ({ children }) => {
     try {
       const { name, email, phone, address, password } = data;
       
-      const response = await fetch('http://127.0.0.1:5000/signup', {
+      const response = await fetch('https://barnmonitor.onrender.com/signup', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +65,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchSession = async () => {    
     try{
-      const res = await fetch("http://127.0.0.1:5000/check_session",{
+      const res = await fetch("https://barnmonitor.onrender.com/check_session",{
         credentials: 'include',
         method: 'GET'
       })

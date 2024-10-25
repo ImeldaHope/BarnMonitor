@@ -14,7 +14,7 @@ const AnimalTypeList = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://127.0.0.1:5000/animal_types")
+    fetch("https://barnmonitor.onrender.com/animal_types")
       .then((response) => response.json())
       .then((data) => setAnimalTypes(data))
       .catch((error) => console.error("Error:", error))
@@ -25,7 +25,7 @@ const AnimalTypeList = () => {
     e.preventDefault();
     const newAnimalType = { type_name: typeName, description };
 
-    fetch("http://127.0.0.1:5000/animal_types", {
+    fetch("https://barnmonitor.onrender.com/animal_types", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +46,7 @@ const AnimalTypeList = () => {
   };
 
   const handleTypeClick = (typeId) => {
-    fetch(`http://127.0.0.1:5000/animal_types/${typeId}`)
+    fetch(`https://barnmonitor.onrender.com/animal_types/${typeId}`)
       .then((response) => response.json())
       .then((data) => {
         setSelectedType(data.type);
@@ -57,7 +57,7 @@ const AnimalTypeList = () => {
 
   const handleDelete = (typeId) => {
     if (window.confirm("Are you sure you want to delete this animal type?")) {
-      fetch(`http://127.0.0.1:5000/animal_types/${typeId}`, {
+      fetch(`https://barnmonitor.onrender.com/animal_types/${typeId}`, {
         method: "DELETE",
       })
         .then(() => {
