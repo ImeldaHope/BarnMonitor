@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "../AuthContext";
 import logo from '../assets/barnmonitor-logo.svg';
+import { Link } from 'react-router-dom';
 
 function Sidebar() {
    
@@ -21,31 +22,31 @@ function Sidebar() {
             </div>
             <ul className="space-y-4 text-lg text-gray-700">                
                 <li>
-                    <a href="/dashboard" className="hover:text-secondary_1 hover:font-bold">Dashboard</a>
+                    <Link to="/dashboard" className="hover:text-secondary_1 hover:font-bold">Dashboard</Link>
                 </li>
                 <li>
-                    <a href="/animals" className="hover:text-secondary_1 hover:font-bold">Animals</a>
+                    <Link to="/animals" className="hover:text-secondary_1 hover:font-bold">Animals</Link>
                 </li>
                 <li>
-                    <a href="/animal_types" className="hover:text-secondary_1 hover:font-bold">Animal Type</a>
+                    <Link to="/animal_types" className="hover:text-secondary_1 hover:font-bold">Animal Type</Link>
                 </li>
                 <li>
-                    <a href="/sales" className="hover:text-secondary_1 hover:font-bold">Sale</a>
+                    <Link to="/sales" className="hover:text-secondary_1 hover:font-bold">Sale</Link>
                 </li>                
                 <li>
-                    <a href="/production" className="hover:text-secondary_1 hover:font-bold active:text-primary_2">Production</a>
+                    <Link to="/production" className="hover:text-secondary_1 hover:font-bold active:text-primary_2">Production</Link>
                 </li>
                 <li>
-                    <a href="/health_records" className="hover:text-secondary_1 hover:font-bold">Health Records</a>
+                    <Link to="/health_records" className="hover:text-secondary_1 hover:font-bold">Health Records</Link>
                 </li>                
                 <li>
-                    <a href="/feeds" className="hover:text-secondary_1 hover:font-bold">Feed</a>
+                    <Link to="/feeds" className="hover:text-secondary_1 hover:font-bold">Feed</Link>
                 </li>
                 <li>
-                    <a href="/profile" className="hover:text-secondary_1 hover:font-bold">Profile</a>
+                    <Link to="/profile" className="hover:text-secondary_1 hover:font-bold">Profile</Link>
                 </li>
                 <li>
-                    <a onClick={() => auth.handleLogOut()} href="/" className="p-2 font-bold text-white bg-secondary_1 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500">Logout</a>
+                    <Link onClick={() => auth.handleLogOut()} to="/" className="p-2 font-bold text-white bg-secondary_1 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500">Logout</Link>
                 </li>
             </ul>
         </aside>
