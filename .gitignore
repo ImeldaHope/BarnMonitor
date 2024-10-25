@@ -60,8 +60,6 @@ jspm_packages
 __pycache__
 
 # database
-*.db
-
 .vscode
 package-lock.json
 
