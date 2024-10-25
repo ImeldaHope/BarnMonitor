@@ -532,4 +532,4 @@ api.add_resource(SaleResource, '/sales', '/sales/<int:id>')
 if __name__ == '__main__':
     with app.app_context():  
         db.create_all()  
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5555 ,debug=True)
