@@ -50,7 +50,7 @@ const Login = () => {
         <button type="submit" className="p-3 font-bold w-full text-white bg-primary_2 hover:bg-primary_2-dark rounded-lg transition duration-200 active:bg-gradient-to-r active:from-green-400 active:to-blue-500">Login</button>
       </form>
       <p className='text-secondary_2'>
-        Don't have an account?<Link href="/signup" className='text-secondary_1 underline font-normal visited:text-purple-600'>Sign up</Link>
+        Don't have an account?<Link to="/signup" className='text-secondary_1 underline font-normal visited:text-purple-600'>Sign up</Link>
       </p>
     </div>
   );
