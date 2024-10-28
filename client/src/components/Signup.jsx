@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import logo from '../assets/barnmonitor-logo.svg';
 import {useAuth} from '../AuthContext';
+import { Link } from 'react-router-dom';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -101,7 +102,7 @@ const Signup = () => {
         </button>
       </form>
       <p className='text-secondary_2'>
-        Already have an account?<a href="/login" className='text-secondary_1 underline font-normal visited:text-purple-600'>Login</a>
+        Already have an account?<Link to="/login" className='text-secondary_1 underline font-normal visited:text-purple-600'>Login</Link>
       </p>
     </div>
   );
